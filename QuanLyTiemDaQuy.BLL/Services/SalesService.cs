@@ -13,12 +13,14 @@ namespace QuanLyTiemDaQuy.BLL.Services
         private readonly InvoiceRepository _invoiceRepository;
         private readonly ProductRepository _productRepository;
         private readonly CustomerRepository _customerRepository;
+        private readonly CustomerService _customerService;
 
         public SalesService()
         {
             _invoiceRepository = new InvoiceRepository();
             _productRepository = new ProductRepository();
             _customerRepository = new CustomerRepository();
+            _customerService = new CustomerService();
         }
 
         #region Invoice Operations
@@ -82,6 +84,13 @@ namespace QuanLyTiemDaQuy.BLL.Services
                 if (invoice.CustomerId > 0)
                 {
                     _customerRepository.UpdateTotalPurchase(invoice.CustomerId, invoice.Total);
+                    
+                    // Check and upgrade tier after purchase
+                    var tierResult = _customerService.CheckAndUpgradeTier(invoice.CustomerId);
+                    if (tierResult.Upgraded)
+                    {
+                        return (true, $"Đã xuất hoá đơn {invoice.InvoiceCode}. \nKhách hàng đã được nâng hạng lên {tierResult.NewTier} (chiết khấu {tierResult.DiscountPercent}%)");
+                    }
                 }
                 return (true, $"Đã xuất hoá đơn {invoice.InvoiceCode}");
             }
@@ -256,16 +265,35 @@ namespace QuanLyTiemDaQuy.BLL.Services
         /// <summary>
         /// Tính toán lại tổng tiền hóa đơn
         /// </summary>
-        public Invoice CalculateInvoiceTotals(List<InvoiceDetail> details, decimal discountPercent = 0, decimal vatPercent = 10)
+        public Invoice CalculateInvoiceTotals(List<InvoiceDetail> details, int customerId = 0, decimal manualDiscountPercent = 0, decimal vatPercent = 10)
         {
+            // Lấy chiết khấu từ tier khách hàng nếu có
+            decimal tierDiscount = 0;
+            if (customerId > 0)
+            {
+                tierDiscount = _customerService.GetCustomerDiscount(customerId);
+            }
+
+            // Sử dụng chiết khấu cao hơn giữa tier và manual
+            decimal finalDiscount = Math.Max(tierDiscount, manualDiscountPercent);
+
             var invoice = new Invoice
             {
                 Details = details,
-                DiscountPercent = discountPercent,
+                DiscountPercent = finalDiscount,
                 VAT = vatPercent
             };
             invoice.CalculateTotals();
             return invoice;
+        }
+
+        /// <summary>
+        /// Lấy % chiết khấu cho khách hàng theo tier
+        /// </summary>
+        public decimal GetCustomerTierDiscount(int customerId)
+        {
+            if (customerId <= 0) return 0;
+            return _customerService.GetCustomerDiscount(customerId);
         }
 
         #endregion

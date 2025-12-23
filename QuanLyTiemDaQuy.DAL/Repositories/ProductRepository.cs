@@ -254,6 +254,95 @@ namespace QuanLyTiemDaQuy.DAL.Repositories
         }
 
         /// <summary>
+        /// Lấy mã sản phẩm tiếp theo theo loại đá
+        /// Format: [PREFIX]-[XXX] (ví dụ: KC-001 cho Kim cương)
+        /// </summary>
+        public string GetNextProductCode(string stoneTypeName)
+        {
+            // Mapping loại đá sang prefix
+            string prefix = GetStoneTypePrefix(stoneTypeName);
+            
+            // Tìm mã cao nhất với prefix này
+            string query = @"
+                SELECT MAX(ProductCode) FROM Products 
+                WHERE ProductCode LIKE @Pattern";
+            
+            var result = DatabaseHelper.ExecuteScalar(query,
+                DatabaseHelper.CreateParameter("@Pattern", prefix + "-%"));
+            
+            int nextNumber = 1;
+            
+            if (result != null && result != DBNull.Value)
+            {
+                string lastCode = result.ToString();
+                // Parse số từ mã cuối (ví dụ: KC-015 -> 15)
+                int dashIndex = lastCode.LastIndexOf('-');
+                if (dashIndex >= 0 && dashIndex < lastCode.Length - 1)
+                {
+                    string numPart = lastCode.Substring(dashIndex + 1);
+                    if (int.TryParse(numPart, out int lastNum))
+                    {
+                        nextNumber = lastNum + 1;
+                    }
+                }
+            }
+            
+            // Format: PREFIX-XXX (3 chữ số)
+            return $"{prefix}-{nextNumber:D3}";
+        }
+
+        /// <summary>
+        /// Lấy prefix code theo tên loại đá
+        /// </summary>
+        private string GetStoneTypePrefix(string stoneTypeName)
+        {
+            if (string.IsNullOrEmpty(stoneTypeName))
+                return "SP";
+
+            string name = stoneTypeName.Trim().ToLower();
+            
+            // Mapping các loại đá phổ biến
+            if (name.Contains("kim cương") || name.Contains("diamond"))
+                return "KC";
+            if (name.Contains("ruby") || name.Contains("hồng ngọc"))
+                return "RB";
+            if (name.Contains("sapphire") || name.Contains("bích ngọc"))
+                return "SP";
+            if (name.Contains("emerald") || name.Contains("ngọc lục bảo"))
+                return "EM";
+            if (name.Contains("opal") || name.Contains("mắt mèo"))
+                return "OP";
+            if (name.Contains("pearl") || name.Contains("ngọc trai"))
+                return "PR";
+            if (name.Contains("topaz"))
+                return "TP";
+            if (name.Contains("amethyst") || name.Contains("thạch anh tím"))
+                return "AM";
+            if (name.Contains("aquamarine"))
+                return "AQ";
+            if (name.Contains("jade") || name.Contains("ngọc bích") || name.Contains("cẩm thạch"))
+                return "JD";
+            if (name.Contains("tanzanite"))
+                return "TZ";
+            if (name.Contains("tourmaline"))
+                return "TM";
+            if (name.Contains("garnet"))
+                return "GR";
+            if (name.Contains("peridot"))
+                return "PD";
+            if (name.Contains("citrine"))
+                return "CT";
+            if (name.Contains("alexandrite"))
+                return "AL";
+            
+            // Mặc định: lấy 2 ký tự đầu viết hoa
+            if (stoneTypeName.Length >= 2)
+                return stoneTypeName.Substring(0, 2).ToUpper();
+            
+            return "XX";
+        }
+
+        /// <summary>
         /// Kiểm tra mã sản phẩm đã tồn tại chưa
         /// </summary>
         public bool IsCodeExists(string productCode, int? excludeId = null)

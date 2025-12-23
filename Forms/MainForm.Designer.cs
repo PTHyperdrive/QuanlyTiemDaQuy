@@ -21,6 +21,7 @@ namespace QuanLyTiemDaQuy.Forms
             this.btnLogout = new System.Windows.Forms.Button();
             this.btnUsers = new System.Windows.Forms.Button();
             this.btnReport = new System.Windows.Forms.Button();
+            this.btnMarketPrice = new System.Windows.Forms.Button();
             this.btnImport = new System.Windows.Forms.Button();
             this.btnSales = new System.Windows.Forms.Button();
             this.btnSuppliers = new System.Windows.Forms.Button();
@@ -75,6 +76,7 @@ namespace QuanLyTiemDaQuy.Forms
             this.pnlSidebar.Controls.Add(this.btnLogout);
             this.pnlSidebar.Controls.Add(this.btnUsers);
             this.pnlSidebar.Controls.Add(this.btnReport);
+            this.pnlSidebar.Controls.Add(this.btnMarketPrice);
             this.pnlSidebar.Controls.Add(this.btnImport);
             this.pnlSidebar.Controls.Add(this.btnSales);
             this.pnlSidebar.Controls.Add(this.btnSuppliers);
@@ -138,6 +140,23 @@ namespace QuanLyTiemDaQuy.Forms
             this.btnReport.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnReport.UseVisualStyleBackColor = true;
             this.btnReport.Click += new System.EventHandler(this.btnReport_Click);
+            // 
+            // btnMarketPrice
+            // 
+            this.btnMarketPrice.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnMarketPrice.FlatAppearance.BorderSize = 0;
+            this.btnMarketPrice.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnMarketPrice.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.btnMarketPrice.ForeColor = System.Drawing.Color.Gainsboro;
+            this.btnMarketPrice.Location = new System.Drawing.Point(0, 375);
+            this.btnMarketPrice.Name = "btnMarketPrice";
+            this.btnMarketPrice.Padding = new System.Windows.Forms.Padding(15, 0, 0, 0);
+            this.btnMarketPrice.Size = new System.Drawing.Size(220, 45);
+            this.btnMarketPrice.TabIndex = 11;
+            this.btnMarketPrice.Text = "💱  Giá thị trường";
+            this.btnMarketPrice.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnMarketPrice.UseVisualStyleBackColor = true;
+            this.btnMarketPrice.Click += new System.EventHandler(this.btnMarketPrice_Click);
             // 
             // btnImport
             // 
@@ -603,6 +622,7 @@ namespace QuanLyTiemDaQuy.Forms
         private System.Windows.Forms.Button btnSales;
         private System.Windows.Forms.Button btnImport;
         private System.Windows.Forms.Button btnReport;
+        private System.Windows.Forms.Button btnMarketPrice;
         private System.Windows.Forms.Button btnUsers;
         private System.Windows.Forms.Button btnLogout;
         private System.Windows.Forms.Panel pnlHeader;

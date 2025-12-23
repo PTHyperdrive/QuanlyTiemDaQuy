@@ -161,5 +161,104 @@ namespace QuanLyTiemDaQuy.DAL.Repositories
         }
 
         #endregion
+
+        #region Price History
+
+        /// <summary>
+        /// Thêm bản ghi lịch sử giá
+        /// </summary>
+        public void InsertPriceHistory(int stoneTypeId, decimal pricePerCarat, string source)
+        {
+            try
+            {
+                // Kiểm tra xem bảng tồn tại không, nếu không thì tạo
+                EnsurePriceHistoryTableExists();
+
+                string query = @"
+                    INSERT INTO MarketPriceHistory (StoneTypeId, PricePerCarat, RecordedAt, Source)
+                    VALUES (@StoneTypeId, @PricePerCarat, GETDATE(), @Source)";
+                
+                DatabaseHelper.ExecuteNonQuery(query,
+                    DatabaseHelper.CreateParameter("@StoneTypeId", stoneTypeId),
+                    DatabaseHelper.CreateParameter("@PricePerCarat", pricePerCarat),
+                    DatabaseHelper.CreateParameter("@Source", source ?? "Manual"));
+            }
+            catch (Exception)
+            {
+                // Silently fail if table doesn't exist or other issues
+            }
+        }
+
+        /// <summary>
+        /// Lấy lịch sử giá của một loại đá
+        /// </summary>
+        public List<MarketPriceHistory> GetPriceHistory(int stoneTypeId, int days = 30)
+        {
+            var list = new List<MarketPriceHistory>();
+            
+            try
+            {
+                string query = @"
+                    SELECT h.*, st.Name AS StoneTypeName
+                    FROM MarketPriceHistory h
+                    INNER JOIN StoneTypes st ON h.StoneTypeId = st.StoneTypeId
+                    WHERE h.StoneTypeId = @StoneTypeId
+                        AND h.RecordedAt >= DATEADD(day, -@Days, GETDATE())
+                    ORDER BY h.RecordedAt DESC";
+                
+                var dt = DatabaseHelper.ExecuteQuery(query,
+                    DatabaseHelper.CreateParameter("@StoneTypeId", stoneTypeId),
+                    DatabaseHelper.CreateParameter("@Days", days));
+                
+                foreach (DataRow row in dt.Rows)
+                {
+                    list.Add(new MarketPriceHistory
+                    {
+                        Id = Convert.ToInt32(row["Id"]),
+                        StoneTypeId = Convert.ToInt32(row["StoneTypeId"]),
+                        StoneTypeName = row["StoneTypeName"]?.ToString() ?? "",
+                        PricePerCarat = Convert.ToDecimal(row["PricePerCarat"]),
+                        RecordedAt = Convert.ToDateTime(row["RecordedAt"]),
+                        Source = row["Source"]?.ToString() ?? "Manual"
+                    });
+                }
+            }
+            catch (Exception)
+            {
+                // Return empty list if table doesn't exist
+            }
+            
+            return list;
+        }
+
+        /// <summary>
+        /// Đảm bảo bảng MarketPriceHistory tồn tại
+        /// </summary>
+        private void EnsurePriceHistoryTableExists()
+        {
+            try
+            {
+                string checkQuery = @"
+                    IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='MarketPriceHistory' AND xtype='U')
+                    BEGIN
+                        CREATE TABLE MarketPriceHistory (
+                            Id INT IDENTITY(1,1) PRIMARY KEY,
+                            StoneTypeId INT NOT NULL,
+                            PricePerCarat DECIMAL(18,2) NOT NULL,
+                            RecordedAt DATETIME DEFAULT GETDATE(),
+                            Source NVARCHAR(100) DEFAULT 'Manual',
+                            CONSTRAINT FK_PriceHistory_StoneType FOREIGN KEY (StoneTypeId) 
+                                REFERENCES StoneTypes(StoneTypeId) ON DELETE CASCADE
+                        )
+                    END";
+                DatabaseHelper.ExecuteNonQuery(checkQuery);
+            }
+            catch (Exception)
+            {
+                // Ignore errors - table might already exist or FK constraint issue
+            }
+        }
+
+        #endregion
     }
 }

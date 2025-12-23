@@ -18,5 +18,60 @@ namespace QuanLyTiemDaQuy.Models
 
         // Display property
         public string DisplayText { get { return Name + " - " + Phone + " (" + Tier + ")"; } }
+        
+        /// <summary>
+        /// Lấy % chiết khấu dựa trên hạng khách hàng
+        /// VVIP: 25%, VIP: 10%, Thường: 0%
+        /// </summary>
+        public decimal DiscountPercent
+        {
+            get { return GetDiscountByTier(Tier); }
+        }
+
+        /// <summary>
+        /// Lấy % chiết khấu theo tier
+        /// </summary>
+        public static decimal GetDiscountByTier(string tier)
+        {
+            switch (tier)
+            {
+                case "VVIP":
+                    return 25m;
+                case "VIP":
+                    return 10m;
+                default:
+                    return 0m;
+            }
+        }
+
+        /// <summary>
+        /// Lấy ngưỡng tổng mua để đạt tier
+        /// VVIP: ≥ 1 tỷ, VIP: ≥ 500 triệu
+        /// </summary>
+        public static decimal GetTierThreshold(string tier)
+        {
+            switch (tier)
+            {
+                case "VVIP":
+                    return 1000000000m; // 1 tỷ
+                case "VIP":
+                    return 500000000m;  // 500 triệu
+                default:
+                    return 0m;
+            }
+        }
+
+        /// <summary>
+        /// Xác định tier dựa trên tổng mua hàng
+        /// </summary>
+        public static string DetermineTier(decimal totalPurchase)
+        {
+            if (totalPurchase >= 1000000000m) // 1 tỷ
+                return "VVIP";
+            else if (totalPurchase >= 500000000m) // 500 triệu
+                return "VIP";
+            else
+                return "Thường";
+        }
     }
 }

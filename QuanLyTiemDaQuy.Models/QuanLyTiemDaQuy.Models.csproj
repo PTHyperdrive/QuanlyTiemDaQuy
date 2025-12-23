@@ -47,6 +47,7 @@
     <Compile Include="ReportModels.cs" />
     <Compile Include="StoneType.cs" />
     <Compile Include="Supplier.cs" />
+    <Compile Include="MarketPriceApiModels.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

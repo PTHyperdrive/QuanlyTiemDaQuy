@@ -207,7 +207,7 @@ namespace QuanLyTiemDaQuy.Forms
                 {
                     cboCustomer.Items.Add(c);
                 }
-                cboCustomer.DisplayMember = "Name";
+                cboCustomer.DisplayMember = "DisplayText";
                 cboCustomer.ValueMember = "CustomerId";
                 cboCustomer.SelectedIndex = 0;
             }
@@ -215,6 +215,22 @@ namespace QuanLyTiemDaQuy.Forms
             {
                 MessageBox.Show($"Lỗi tải khách hàng: {ex.Message}", "Lỗi");
             }
+        }
+
+        private void cboCustomer_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // Cập nhật chiết khấu khi chọn khách hàng
+            var selectedCustomer = cboCustomer.SelectedItem as Customer;
+            if (selectedCustomer != null && selectedCustomer.CustomerId > 0)
+            {
+                // Tự động set chiết khấu theo tier khách hàng
+                decimal tierDiscount = selectedCustomer.DiscountPercent;
+                if (tierDiscount > nudDiscount.Value)
+                {
+                    nudDiscount.Value = tierDiscount;
+                }
+            }
+            UpdateTotals();
         }
 
         private void btnAddToCart_Click(object sender, EventArgs e)
@@ -299,13 +315,21 @@ namespace QuanLyTiemDaQuy.Forms
 
         private void UpdateTotals()
         {
-            decimal discount = (decimal)nudDiscount.Value;
+            decimal manualDiscount = (decimal)nudDiscount.Value;
             decimal vat = (decimal)nudVAT.Value;
+            
+            // Lấy customerId nếu đã chọn khách hàng
+            int customerId = 0;
+            var selectedCustomer = cboCustomer.SelectedItem as Customer;
+            if (selectedCustomer != null)
+            {
+                customerId = selectedCustomer.CustomerId;
+            }
 
-            var invoice = _salesService.CalculateInvoiceTotals(_cart, discount, vat);
+            var invoice = _salesService.CalculateInvoiceTotals(_cart, customerId, manualDiscount, vat);
 
             lblSubtotal.Text = invoice.Subtotal.ToString("N0") + " VNĐ";
-            lblDiscount.Text = "-" + invoice.DiscountAmount.ToString("N0") + " VNĐ";
+            lblDiscount.Text = "-" + invoice.DiscountAmount.ToString("N0") + " VNĐ" + (invoice.DiscountPercent > 0 ? $" ({invoice.DiscountPercent}%)" : "");
             lblVAT.Text = "+" + invoice.VATAmount.ToString("N0") + " VNĐ";
             lblTotal.Text = invoice.Total.ToString("N0") + " VNĐ";
 

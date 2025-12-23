@@ -70,6 +70,8 @@ namespace QuanLyTiemDaQuy.Forms
             }
             if (dgvCustomers.Columns.Contains("CreatedAt"))
                 dgvCustomers.Columns["CreatedAt"].HeaderText = "Ngày tạo";
+            if (dgvCustomers.Columns.Contains("DiscountPercent"))
+                dgvCustomers.Columns["DiscountPercent"].HeaderText = "Chiết khấu (%)";
         }
 
         private void btnSearch_Click(object sender, EventArgs e)
@@ -79,17 +81,33 @@ namespace QuanLyTiemDaQuy.Forms
 
         private void btnAdd_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Chức năng Thêm khách hàng sẽ được phát triển!", "Thông báo");
+            using (var form = new CustomerEditForm())
+            {
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    LoadCustomers();
+                }
+            }
         }
 
         private void btnEdit_Click(object sender, EventArgs e)
         {
             if (dgvCustomers.SelectedRows.Count == 0)
             {
-                MessageBox.Show("Vui lòng chọn khách hàng cần sửa!", "Thông báo");
+                MessageBox.Show("Vui lòng chọn khách hàng cần sửa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            MessageBox.Show("Chức năng Sửa khách hàng sẽ được phát triển!", "Thông báo");
+
+            var customer = dgvCustomers.SelectedRows[0].DataBoundItem as Customer;
+            if (customer == null) return;
+
+            using (var form = new CustomerEditForm(customer))
+            {
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    LoadCustomers();
+                }
+            }
         }
 
         private void btnDelete_Click(object sender, EventArgs e)

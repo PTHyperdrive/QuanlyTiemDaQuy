@@ -188,6 +188,13 @@ namespace QuanLyTiemDaQuy.Forms
             OpenChildForm(new SupplierForm());
         }
 
+        private void btnMarketPrice_Click(object sender, EventArgs e)
+        {
+            ActivateButton(sender);
+            pnlDashboard.Visible = false;
+            OpenChildForm(new MarketPriceForm());
+        }
+
 
 
         #endregion

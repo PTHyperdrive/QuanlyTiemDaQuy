@@ -92,31 +92,35 @@ namespace QuanLyTiemDaQuy.BLL.Services
 
         /// <summary>
         /// Tự động nâng cấp tier dựa trên tổng mua hàng
+        /// VVIP: ≥ 1 tỷ (25% chiết khấu), VIP: ≥ 500 triệu (10% chiết khấu)
         /// </summary>
-        public (bool Upgraded, string NewTier) CheckAndUpgradeTier(int customerId)
+        public (bool Upgraded, string NewTier, decimal DiscountPercent) CheckAndUpgradeTier(int customerId)
         {
             var customer = _customerRepository.GetById(customerId);
             if (customer == null)
-                return (false, "");
+                return (false, "", 0);
 
-            string newTier = customer.Tier;
+            string oldTier = customer.Tier;
+            string newTier = Customer.DetermineTier(customer.TotalPurchase);
 
-            // Logic nâng tier
-            if (customer.TotalPurchase >= 500000000) // 500 triệu -> VVIP
-                newTier = "VVIP";
-            else if (customer.TotalPurchase >= 100000000) // 100 triệu -> VIP
-                newTier = "VIP";
-            else
-                newTier = "Thường";
-
-            if (newTier != customer.Tier)
+            if (newTier != oldTier)
             {
                 customer.Tier = newTier;
                 _customerRepository.Update(customer);
-                return (true, newTier);
+                return (true, newTier, Customer.GetDiscountByTier(newTier));
             }
 
-            return (false, customer.Tier);
+            return (false, customer.Tier, Customer.GetDiscountByTier(customer.Tier));
+        }
+
+        /// <summary>
+        /// Lấy % chiết khấu cho khách hàng
+        /// </summary>
+        public decimal GetCustomerDiscount(int customerId)
+        {
+            var customer = _customerRepository.GetById(customerId);
+            if (customer == null) return 0;
+            return customer.DiscountPercent;
         }
     }
 }

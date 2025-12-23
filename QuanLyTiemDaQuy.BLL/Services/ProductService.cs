@@ -52,6 +52,15 @@ namespace QuanLyTiemDaQuy.BLL.Services
         }
 
         /// <summary>
+        /// Sinh mã sản phẩm tự động theo loại đá
+        /// Format: [PREFIX]-[XXX] (ví dụ: KC-001 cho Kim cương)
+        /// </summary>
+        public string GenerateProductCode(string stoneTypeName)
+        {
+            return _productRepository.GetNextProductCode(stoneTypeName);
+        }
+
+        /// <summary>
         /// Thêm sản phẩm mới với validation
         /// </summary>
         public (bool Success, string Message, int ProductId) AddProduct(Product product)

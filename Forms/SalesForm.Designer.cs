@@ -22,6 +22,9 @@ namespace QuanLyTiemDaQuy.Forms
             this.pnlCartButtons = new System.Windows.Forms.Panel();
             this.btnClearCart = new System.Windows.Forms.Button();
             this.btnRemoveItem = new System.Windows.Forms.Button();
+            this.btnSavePending = new System.Windows.Forms.Button();
+            this.btnResumePending = new System.Windows.Forms.Button();
+            this.btnCancelPending = new System.Windows.Forms.Button();
             this.pnlAddProduct = new System.Windows.Forms.Panel();
             this.btnAddToCart = new System.Windows.Forms.Button();
             this.nudQty = new System.Windows.Forms.NumericUpDown();
@@ -101,7 +104,7 @@ namespace QuanLyTiemDaQuy.Forms
             this.pnlCartButtons.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.pnlCartButtons.Location = new System.Drawing.Point(0, 540);
             this.pnlCartButtons.Name = "pnlCartButtons";
-            this.pnlCartButtons.Size = new System.Drawing.Size(630, 100);
+            this.pnlCartButtons.Size = new System.Drawing.Size(630, 50);
             this.pnlCartButtons.TabIndex = 1;
             // 
             // btnClearCart
@@ -110,9 +113,9 @@ namespace QuanLyTiemDaQuy.Forms
             this.btnClearCart.FlatAppearance.BorderSize = 0;
             this.btnClearCart.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnClearCart.ForeColor = System.Drawing.Color.White;
-            this.btnClearCart.Location = new System.Drawing.Point(150, 10);
+            this.btnClearCart.Location = new System.Drawing.Point(125, 9);
             this.btnClearCart.Name = "btnClearCart";
-            this.btnClearCart.Size = new System.Drawing.Size(130, 32);
+            this.btnClearCart.Size = new System.Drawing.Size(105, 32);
             this.btnClearCart.TabIndex = 1;
             this.btnClearCart.Text = "🗑️ Xóa tất cả";
             this.btnClearCart.UseVisualStyleBackColor = false;
@@ -124,9 +127,9 @@ namespace QuanLyTiemDaQuy.Forms
             this.btnRemoveItem.FlatAppearance.BorderSize = 0;
             this.btnRemoveItem.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnRemoveItem.ForeColor = System.Drawing.Color.White;
-            this.btnRemoveItem.Location = new System.Drawing.Point(10, 10);
+            this.btnRemoveItem.Location = new System.Drawing.Point(10, 9);
             this.btnRemoveItem.Name = "btnRemoveItem";
-            this.btnRemoveItem.Size = new System.Drawing.Size(130, 32);
+            this.btnRemoveItem.Size = new System.Drawing.Size(105, 32);
             this.btnRemoveItem.TabIndex = 0;
             this.btnRemoveItem.Text = "❌ Xóa dòng";
             this.btnRemoveItem.UseVisualStyleBackColor = false;
@@ -134,14 +137,13 @@ namespace QuanLyTiemDaQuy.Forms
             // 
             // btnSavePending
             // 
-            this.btnSavePending = new System.Windows.Forms.Button();
             this.btnSavePending.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(193)))), ((int)(((byte)(7)))));
             this.btnSavePending.FlatAppearance.BorderSize = 0;
             this.btnSavePending.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSavePending.ForeColor = System.Drawing.Color.Black;
-            this.btnSavePending.Location = new System.Drawing.Point(10, 55);
+            this.btnSavePending.Location = new System.Drawing.Point(240, 9);
             this.btnSavePending.Name = "btnSavePending";
-            this.btnSavePending.Size = new System.Drawing.Size(180, 35);
+            this.btnSavePending.Size = new System.Drawing.Size(120, 32);
             this.btnSavePending.TabIndex = 2;
             this.btnSavePending.Text = "⏳ Lưu chờ thanh toán";
             this.btnSavePending.UseVisualStyleBackColor = false;
@@ -149,14 +151,13 @@ namespace QuanLyTiemDaQuy.Forms
             // 
             // btnResumePending
             // 
-            this.btnResumePending = new System.Windows.Forms.Button();
             this.btnResumePending.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(23)))), ((int)(((byte)(162)))), ((int)(((byte)(184)))));
             this.btnResumePending.FlatAppearance.BorderSize = 0;
             this.btnResumePending.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnResumePending.ForeColor = System.Drawing.Color.White;
-            this.btnResumePending.Location = new System.Drawing.Point(200, 55);
+            this.btnResumePending.Location = new System.Drawing.Point(370, 9);
             this.btnResumePending.Name = "btnResumePending";
-            this.btnResumePending.Size = new System.Drawing.Size(180, 35);
+            this.btnResumePending.Size = new System.Drawing.Size(120, 32);
             this.btnResumePending.TabIndex = 3;
             this.btnResumePending.Text = "📋 Lấy lại HĐ chờ";
             this.btnResumePending.UseVisualStyleBackColor = false;
@@ -164,14 +165,13 @@ namespace QuanLyTiemDaQuy.Forms
             // 
             // btnCancelPending
             // 
-            this.btnCancelPending = new System.Windows.Forms.Button();
             this.btnCancelPending.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(220)))), ((int)(((byte)(53)))), ((int)(((byte)(69)))));
             this.btnCancelPending.FlatAppearance.BorderSize = 0;
             this.btnCancelPending.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCancelPending.ForeColor = System.Drawing.Color.White;
-            this.btnCancelPending.Location = new System.Drawing.Point(390, 55);
+            this.btnCancelPending.Location = new System.Drawing.Point(500, 9);
             this.btnCancelPending.Name = "btnCancelPending";
-            this.btnCancelPending.Size = new System.Drawing.Size(180, 35);
+            this.btnCancelPending.Size = new System.Drawing.Size(120, 32);
             this.btnCancelPending.TabIndex = 4;
             this.btnCancelPending.Text = "🚫 Huỷ HĐ chờ";
             this.btnCancelPending.UseVisualStyleBackColor = false;

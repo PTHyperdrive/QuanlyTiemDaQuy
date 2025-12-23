@@ -22,6 +22,29 @@ namespace QuanLyTiemDaQuy.Forms
         {
             LoadStoneTypes();
             LoadProducts();
+            ApplyRolePermissions();
+        }
+
+        /// <summary>
+        /// Áp dụng phân quyền theo vai trò
+        /// Chỉ Manager/Admin mới được thêm/sửa/xóa sản phẩm
+        /// </summary>
+        private void ApplyRolePermissions()
+        {
+            var employee = EmployeeService.CurrentEmployee;
+            bool canEdit = employee != null && employee.IsManager;
+            
+            btnAdd.Enabled = canEdit;
+            btnEdit.Enabled = canEdit;
+            btnDelete.Enabled = canEdit;
+            
+            // Thay đổi tooltip để thông báo nếu không có quyền
+            if (!canEdit)
+            {
+                btnAdd.Text = "🔒 Thêm mới";
+                btnEdit.Text = "🔒 Sửa";
+                btnDelete.Text = "🔒 Xóa";
+            }
         }
 
         private void LoadStoneTypes()
@@ -90,7 +113,7 @@ namespace QuanLyTiemDaQuy.Forms
             if (dgvProducts.Columns.Count == 0) return;
 
             // Hide some columns
-            string[] hiddenColumns = { "ProductId", "StoneTypeId", "CertId", "ImagePath", "UpdatedAt" };
+            string[] hiddenColumns = { "ProductId", "StoneTypeId", "CertId", "ImagePath", "UpdatedAt", "Profit", "ProfitMargin", "IsLowStock", "IsOutOfStock" };
             foreach (var col in hiddenColumns)
             {
                 if (dgvProducts.Columns.Contains(col))
@@ -128,6 +151,12 @@ namespace QuanLyTiemDaQuy.Forms
                 dgvProducts.Columns["StockQty"].HeaderText = "Tồn kho";
             if (dgvProducts.Columns.Contains("Status"))
                 dgvProducts.Columns["Status"].HeaderText = "Trạng thái";
+            if (dgvProducts.Columns.Contains("CertCode"))
+                dgvProducts.Columns["CertCode"].HeaderText = "Mã chứng nhận";
+            if (dgvProducts.Columns.Contains("DisplayLocation"))
+                dgvProducts.Columns["DisplayLocation"].HeaderText = "Vị trí";
+            if (dgvProducts.Columns.Contains("CreatedAt"))
+                dgvProducts.Columns["CreatedAt"].HeaderText = "Ngày tạo";
 
             // Highlight low stock
             foreach (DataGridViewRow row in dgvProducts.Rows)
@@ -158,7 +187,13 @@ namespace QuanLyTiemDaQuy.Forms
 
         private void btnAdd_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Chức năng Thêm sản phẩm sẽ được phát triển!", "Thông báo");
+            using (var form = new ProductEditForm())
+            {
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    LoadProducts();
+                }
+            }
         }
 
         private void btnEdit_Click(object sender, EventArgs e)
@@ -168,7 +203,17 @@ namespace QuanLyTiemDaQuy.Forms
                 MessageBox.Show("Vui lòng chọn sản phẩm cần sửa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            MessageBox.Show("Chức năng Sửa sản phẩm sẽ được phát triển!", "Thông báo");
+
+            var product = dgvProducts.SelectedRows[0].DataBoundItem as Product;
+            if (product == null) return;
+
+            using (var form = new ProductEditForm(product))
+            {
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    LoadProducts();
+                }
+            }
         }
 
         private void btnDelete_Click(object sender, EventArgs e)
