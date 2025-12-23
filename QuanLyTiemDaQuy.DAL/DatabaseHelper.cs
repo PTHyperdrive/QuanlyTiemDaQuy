@@ -9,9 +9,33 @@ namespace QuanLyTiemDaQuy.DAL
     /// </summary>
     public static class DatabaseHelper
     {
-        // Connection string cho SQL Server Express 2025
+        // ====================================================================================================
+        // CẤU HÌNH KẾT NỐI DATABASE
+        // ====================================================================================================
+        // 
+        // Connection string HIỆN TẠI: SQL Server Express trên máy local
         // Thay đổi server name nếu cần (.\SQLEXPRESS hoặc localhost\SQLEXPRESS)
-        private static string _connectionString = @"Data Source=.\SQLEXPRESS2025;Initial Catalog=QuanLyTiemDaQuy;Integrated Security=True;TrustServerCertificate=True";
+        private static string _connectionString = @"Data Source=tcp:stormtrooper.notrespond.com,1433;Initial Catalog=QuanLyTiemDaQuy;User Id=HUTECH;Password=NRSP3dhouse@;Encrypt=True;TrustServerCertificate=True";
+
+        // ----------------------------------------------------------------------------------------------------
+        // ĐỂ KẾT NỐI TỚI SQL SERVER EXTERNAL (Remote Server), COMMENT dòng trên và UNCOMMENT một trong các 
+        // connection string bên dưới tùy theo loại xác thực:
+        // ----------------------------------------------------------------------------------------------------
+        //
+        // OPTION 1: Windows Authentication (cho server trong cùng domain)
+        // private static string _connectionString = @"Data Source=YOUR_SERVER_IP\INSTANCE_NAME;Initial Catalog=QuanLyTiemDaQuy;Integrated Security=True;TrustServerCertificate=True";
+        //
+        // OPTION 2: SQL Server Authentication (username/password)
+        // private static string _connectionString = @"Data Source=YOUR_SERVER_IP\INSTANCE_NAME;Initial Catalog=QuanLyTiemDaQuy;User Id=YOUR_USERNAME;Password=YOUR_PASSWORD;TrustServerCertificate=True";
+        //
+        // OPTION 3: Azure SQL Database  
+        // private static string _connectionString = @"Server=tcp:YOUR_SERVER.database.windows.net,1433;Initial Catalog=QuanLyTiemDaQuy;User Id=YOUR_USERNAME;Password=YOUR_PASSWORD;Encrypt=True;TrustServerCertificate=False";
+        //
+        // LƯU Ý KHI KẾT NỐI EXTERNAL:
+        // - Đảm bảo SQL Server cho phép remote connections (cấu hình trong SQL Server Configuration Manager)
+        // - Mở port 1433 (hoặc port tùy chọn) trên firewall của server
+        // - Nếu dùng named instance, đảm bảo SQL Server Browser service đang chạy
+        // ----------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// Lấy hoặc set connection string

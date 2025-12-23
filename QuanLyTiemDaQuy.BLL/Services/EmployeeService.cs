@@ -267,6 +267,109 @@ namespace QuanLyTiemDaQuy.BLL.Services
         }
 
         #endregion
+
+        #region Admin Employee Management
+
+        /// <summary>
+        /// Admin đặt mật khẩu tùy ý cho nhân viên
+        /// </summary>
+        public (bool Success, string Message) SetPassword(int employeeId, string newPassword, bool mustChangeOnLogin = false)
+        {
+            if (!CurrentEmployee?.IsAdmin ?? true)
+                return (false, "Chỉ Admin mới có quyền đặt mật khẩu");
+
+            if (string.IsNullOrWhiteSpace(newPassword) || newPassword.Length < 6)
+                return (false, "Mật khẩu phải có ít nhất 6 ký tự");
+
+            try
+            {
+                bool success = _employeeRepository.SetPassword(employeeId, newPassword, mustChangeOnLogin);
+                if (success)
+                {
+                    string msg = mustChangeOnLogin 
+                        ? "Đặt mật khẩu thành công. Nhân viên sẽ phải đổi mật khẩu khi đăng nhập."
+                        : "Đặt mật khẩu thành công";
+                    return (true, msg);
+                }
+                else
+                    return (false, "Không tìm thấy nhân viên");
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Lỗi: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Cập nhật thông tin cá nhân (SĐT, Email)
+        /// </summary>
+        public (bool Success, string Message) UpdatePersonalInfo(int employeeId, string phone, string email)
+        {
+            var employee = _employeeRepository.GetById(employeeId);
+            if (employee == null)
+                return (false, "Không tìm thấy nhân viên");
+
+            employee.Phone = phone;
+            employee.Email = email;
+
+            try
+            {
+                bool success = _employeeRepository.Update(employee);
+                if (success)
+                    return (true, "Cập nhật thông tin thành công");
+                else
+                    return (false, "Không thể cập nhật thông tin");
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Lỗi: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Đặt cờ yêu cầu đổi mật khẩu khi đăng nhập
+        /// </summary>
+        public (bool Success, string Message) SetMustChangePassword(int employeeId, bool mustChange)
+        {
+            try
+            {
+                bool success = _employeeRepository.SetMustChangePassword(employeeId, mustChange);
+                if (success)
+                {
+                    string msg = mustChange 
+                        ? "Đã đánh dấu yêu cầu đổi mật khẩu khi đăng nhập"
+                        : "Đã bỏ yêu cầu đổi mật khẩu khi đăng nhập";
+                    return (true, msg);
+                }
+                else
+                    return (false, "Không tìm thấy nhân viên");
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Lỗi: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Chuyển nhân viên sang chi nhánh khác
+        /// </summary>
+        public (bool Success, string Message) UpdateEmployeeBranch(int employeeId, int branchId)
+        {
+            try
+            {
+                bool success = _employeeRepository.UpdateBranch(employeeId, branchId);
+                if (success)
+                    return (true, "Đã chuyển chi nhánh thành công");
+                else
+                    return (false, "Không tìm thấy nhân viên");
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Lỗi: {ex.Message}");
+            }
+        }
+
+        #endregion
     }
 }
 

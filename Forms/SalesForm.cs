@@ -15,7 +15,7 @@ namespace QuanLyTiemDaQuy.Forms
         private List<InvoiceDetail> _cart;
         private Invoice _currentInvoice;
 
-        // Autocomplete components
+        // Các thành phần autocomplete
         private ListBox lstProductSuggestions;
         private List<Product> _allProducts;
 
@@ -33,7 +33,7 @@ namespace QuanLyTiemDaQuy.Forms
 
         private void SetupAutocomplete()
         {
-            // Create suggestion listbox
+            // Tạo listbox gợi ý
             lstProductSuggestions = new ListBox();
             lstProductSuggestions.BackColor = Color.FromArgb(50, 50, 70);
             lstProductSuggestions.ForeColor = Color.White;
@@ -45,11 +45,11 @@ namespace QuanLyTiemDaQuy.Forms
             lstProductSuggestions.Click += LstProductSuggestions_Click;
             lstProductSuggestions.KeyDown += LstProductSuggestions_KeyDown;
             
-            // Add to form
+            // Thêm vào form
             this.Controls.Add(lstProductSuggestions);
             lstProductSuggestions.BringToFront();
 
-            // Wire up textbox events
+            // Kết nối sự kiện textbox
             txtProductCode.TextChanged += TxtProductCode_TextChanged;
             txtProductCode.Leave += TxtProductCode_Leave;
             txtProductCode.KeyDown += TxtProductCode_KeyDown;
@@ -86,14 +86,14 @@ namespace QuanLyTiemDaQuy.Forms
                 return;
             }
 
-            // Filter products starting with search text
+            // Lọc sản phẩm bắt đầu với từ khóa tìm kiếm
             var matches = new List<Product>();
             foreach (var p in _allProducts)
             {
                 if (p.ProductCode.ToUpper().StartsWith(searchText) || 
                     p.Name.ToUpper().Contains(searchText))
                 {
-                    if (p.StockQty > 0) // Only show in-stock products
+                    if (p.StockQty > 0) // Chỉ hiển thị sản phẩm còn hàng
                         matches.Add(p);
                 }
             }
@@ -106,7 +106,7 @@ namespace QuanLyTiemDaQuy.Forms
                     lstProductSuggestions.Items.Add($"{p.ProductCode} - {p.Name} ({p.StockQty} còn) - {p.SellPrice:N0}đ");
                 }
 
-                // Position listbox below textbox
+                // Đặt vị trí listbox bên dưới textbox
                 Point txtLocation = txtProductCode.Parent.PointToScreen(txtProductCode.Location);
                 Point formLocation = this.PointToClient(txtLocation);
                 lstProductSuggestions.Location = new Point(formLocation.X, formLocation.Y + txtProductCode.Height + 2);
@@ -163,13 +163,13 @@ namespace QuanLyTiemDaQuy.Forms
             if (lstProductSuggestions.SelectedItem != null)
             {
                 string selectedText = lstProductSuggestions.SelectedItem.ToString();
-                // Extract product code (before the first " - ")
+                // Trích xuất mã sản phẩm (trước dấu " - " đầu tiên)
                 int dashIndex = selectedText.IndexOf(" - ");
                 if (dashIndex > 0)
                 {
                     string productCode = selectedText.Substring(0, dashIndex);
                     
-                    // Temporarily remove event handler to avoid recursion
+                    // Tạm thời bỏ event handler để tránh lặp vô hạn
                     txtProductCode.TextChanged -= TxtProductCode_TextChanged;
                     txtProductCode.Text = productCode;
                     txtProductCode.TextChanged += TxtProductCode_TextChanged;
@@ -183,7 +183,7 @@ namespace QuanLyTiemDaQuy.Forms
 
         private void TxtProductCode_Leave(object sender, EventArgs e)
         {
-            // Hide suggestions after a short delay (to allow click on list)
+            // Ẩn gợi ý sau một khoảng ngắn (để cho phép click vào list)
             Timer hideTimer = new Timer();
             hideTimer.Interval = 200;
             hideTimer.Tick += (s, args) =>
@@ -228,7 +228,7 @@ namespace QuanLyTiemDaQuy.Forms
 
             if (result.Success && result.Detail != null)
             {
-                // Check if product already in cart
+                // Kiểm tra sản phẩm đã có trong giỏ chưa
                 bool found = false;
                 foreach (var item in _cart)
                 {
@@ -249,7 +249,7 @@ namespace QuanLyTiemDaQuy.Forms
                 RefreshCart();
                 UpdateTotals();
                 
-                // Clear and refocus
+                // Xóa và focus lại
                 txtProductCode.TextChanged -= TxtProductCode_TextChanged;
                 txtProductCode.Clear();
                 txtProductCode.TextChanged += TxtProductCode_TextChanged;
@@ -352,7 +352,7 @@ namespace QuanLyTiemDaQuy.Forms
                 return;
             }
 
-            // Prepare invoice
+            // Chuẩn bị hoá đơn
             var invoice = new Invoice
             {
                 Details = new List<InvoiceDetail>(_cart),
@@ -362,30 +362,30 @@ namespace QuanLyTiemDaQuy.Forms
                 EmployeeId = EmployeeService.CurrentEmployee?.EmployeeId ?? 1
             };
 
-            // Set customer
+            // Đặt khách hàng
             var selectedCustomer = cboCustomer.SelectedItem as Customer;
             if (selectedCustomer != null && selectedCustomer.CustomerId > 0)
             {
                 invoice.CustomerId = selectedCustomer.CustomerId;
             }
 
-            // Create invoice
+            // Tạo hoá đơn
             var result = _salesService.CreateInvoice(invoice);
 
             if (result.Success)
             {
                 MessageBox.Show(result.Message, "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                // Clear cart
+                // Xóa giỏ hàng
                 _cart.Clear();
                 RefreshCart();
                 UpdateTotals();
                 cboCustomer.SelectedIndex = 0;
                 
-                // Reload products to refresh stock
+                // Tải lại sản phẩm để cập nhật tồn kho
                 LoadProducts();
 
-                // TODO: Print invoice
+                // TODO: In hoá đơn
             }
             else
             {
@@ -419,7 +419,7 @@ namespace QuanLyTiemDaQuy.Forms
             }
         }
 
-        #region Pending Invoice Workflow
+        #region Quy trình Hoá đơn chờ thanh toán
 
         /// <summary>
         /// Lưu hoá đơn đang chờ thanh toán (mỗi chi nhánh chỉ 1 HĐ pending)
@@ -493,7 +493,7 @@ namespace QuanLyTiemDaQuy.Forms
                 return;
             }
 
-            // Load invoice details into cart
+            // Tải chi tiết hoá đơn vào giỏ hàng
             _cart.Clear();
             if (pendingInvoice.Details != null)
             {
@@ -503,11 +503,11 @@ namespace QuanLyTiemDaQuy.Forms
                 }
             }
 
-            // Set form values
+            // Đặt giá trị form
             nudDiscount.Value = pendingInvoice.DiscountPercent;
             nudVAT.Value = pendingInvoice.VAT;
             
-            // Find and select customer
+            // Tìm và chọn khách hàng
             for (int i = 0; i < cboCustomer.Items.Count; i++)
             {
                 var customer = cboCustomer.Items[i] as Customer;

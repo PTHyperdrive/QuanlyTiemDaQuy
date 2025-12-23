@@ -15,21 +15,34 @@ namespace QuanLyTiemDaQuy.DAL.Repositories
     {
         public List<Employee> GetAll()
         {
-            string query = "SELECT * FROM Employees ORDER BY Name";
+            string query = @"
+                SELECT e.*, b.Name as BranchName 
+                FROM Employees e 
+                LEFT JOIN Branches b ON e.BranchId = b.BranchId 
+                ORDER BY e.Name";
             var dt = DatabaseHelper.ExecuteQuery(query);
             return MapDataTableToList(dt);
         }
 
         public List<Employee> GetActive()
         {
-            string query = "SELECT * FROM Employees WHERE IsActive = 1 ORDER BY Name";
+            string query = @"
+                SELECT e.*, b.Name as BranchName 
+                FROM Employees e 
+                LEFT JOIN Branches b ON e.BranchId = b.BranchId 
+                WHERE e.IsActive = 1 
+                ORDER BY e.Name";
             var dt = DatabaseHelper.ExecuteQuery(query);
             return MapDataTableToList(dt);
         }
 
         public Employee? GetById(int employeeId)
         {
-            string query = "SELECT * FROM Employees WHERE EmployeeId = @EmployeeId";
+            string query = @"
+                SELECT e.*, b.Name as BranchName 
+                FROM Employees e 
+                LEFT JOIN Branches b ON e.BranchId = b.BranchId 
+                WHERE e.EmployeeId = @EmployeeId";
             var dt = DatabaseHelper.ExecuteQuery(query, 
                 DatabaseHelper.CreateParameter("@EmployeeId", employeeId));
             
@@ -39,7 +52,11 @@ namespace QuanLyTiemDaQuy.DAL.Repositories
 
         public Employee? GetByUsername(string username)
         {
-            string query = "SELECT * FROM Employees WHERE Username = @Username";
+            string query = @"
+                SELECT e.*, b.Name as BranchName 
+                FROM Employees e 
+                LEFT JOIN Branches b ON e.BranchId = b.BranchId 
+                WHERE e.Username = @Username";
             var dt = DatabaseHelper.ExecuteQuery(query, 
                 DatabaseHelper.CreateParameter("@Username", username));
             
@@ -54,8 +71,10 @@ namespace QuanLyTiemDaQuy.DAL.Repositories
         {
             string passwordHash = HashPassword(password);
             string query = @"
-                SELECT * FROM Employees 
-                WHERE Username = @Username AND PasswordHash = @PasswordHash AND IsActive = 1";
+                SELECT e.*, b.Name as BranchName 
+                FROM Employees e 
+                LEFT JOIN Branches b ON e.BranchId = b.BranchId 
+                WHERE e.Username = @Username AND e.PasswordHash = @PasswordHash AND e.IsActive = 1";
             
             var dt = DatabaseHelper.ExecuteQuery(query, 
                 DatabaseHelper.CreateParameter("@Username", username),
@@ -113,11 +132,54 @@ namespace QuanLyTiemDaQuy.DAL.Repositories
 
         public bool UpdatePassword(int employeeId, string newPassword)
         {
-            string query = "UPDATE Employees SET PasswordHash = @PasswordHash WHERE EmployeeId = @EmployeeId";
+            string query = "UPDATE Employees SET PasswordHash = @PasswordHash, MustChangePassword = 0 WHERE EmployeeId = @EmployeeId";
             
             int affected = DatabaseHelper.ExecuteNonQuery(query,
                 DatabaseHelper.CreateParameter("@EmployeeId", employeeId),
                 DatabaseHelper.CreateParameter("@PasswordHash", HashPassword(newPassword)));
+            
+            return affected > 0;
+        }
+
+        /// <summary>
+        /// Admin đặt mật khẩu tùy ý cho nhân viên
+        /// </summary>
+        public bool SetPassword(int employeeId, string newPassword, bool mustChangeOnLogin = false)
+        {
+            string query = "UPDATE Employees SET PasswordHash = @PasswordHash, MustChangePassword = @MustChange WHERE EmployeeId = @EmployeeId";
+            
+            int affected = DatabaseHelper.ExecuteNonQuery(query,
+                DatabaseHelper.CreateParameter("@EmployeeId", employeeId),
+                DatabaseHelper.CreateParameter("@PasswordHash", HashPassword(newPassword)),
+                DatabaseHelper.CreateParameter("@MustChange", mustChangeOnLogin));
+            
+            return affected > 0;
+        }
+
+        /// <summary>
+        /// Cập nhật chi nhánh cho nhân viên
+        /// </summary>
+        public bool UpdateBranch(int employeeId, int branchId)
+        {
+            string query = "UPDATE Employees SET BranchId = @BranchId WHERE EmployeeId = @EmployeeId";
+            
+            int affected = DatabaseHelper.ExecuteNonQuery(query,
+                DatabaseHelper.CreateParameter("@EmployeeId", employeeId),
+                DatabaseHelper.CreateParameter("@BranchId", branchId));
+            
+            return affected > 0;
+        }
+
+        /// <summary>
+        /// Đặt cờ yêu cầu đổi mật khẩu khi đăng nhập
+        /// </summary>
+        public bool SetMustChangePassword(int employeeId, bool mustChange)
+        {
+            string query = "UPDATE Employees SET MustChangePassword = @MustChange WHERE EmployeeId = @EmployeeId";
+            
+            int affected = DatabaseHelper.ExecuteNonQuery(query,
+                DatabaseHelper.CreateParameter("@EmployeeId", employeeId),
+                DatabaseHelper.CreateParameter("@MustChange", mustChange));
             
             return affected > 0;
         }
@@ -187,6 +249,12 @@ namespace QuanLyTiemDaQuy.DAL.Repositories
                     Phone = DatabaseHelper.GetString(row, "Phone"),
                     Email = DatabaseHelper.GetString(row, "Email"),
                     IsActive = Convert.ToBoolean(row["IsActive"]),
+                    MustChangePassword = dt.Columns.Contains("MustChangePassword") && row["MustChangePassword"] != DBNull.Value
+                        ? Convert.ToBoolean(row["MustChangePassword"]) : false,
+                    BranchId = dt.Columns.Contains("BranchId") && row["BranchId"] != DBNull.Value
+                        ? Convert.ToInt32(row["BranchId"]) : 0,
+                    BranchName = dt.Columns.Contains("BranchName") && row["BranchName"] != DBNull.Value
+                        ? DatabaseHelper.GetString(row, "BranchName") : "",
                     CreatedAt = Convert.ToDateTime(row["CreatedAt"])
                 });
             }

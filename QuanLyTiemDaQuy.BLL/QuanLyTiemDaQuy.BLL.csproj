@@ -12,6 +12,7 @@
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <LangVersion>8.0</LangVersion>
+    <NoWarn>CS8632</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -38,6 +39,7 @@
   <ItemGroup>
     <Compile Include="InputValidator.cs" />
     <Compile Include="Services\CustomerService.cs" />
+    <Compile Include="Services\BranchService.cs" />
     <Compile Include="Services\EmployeeService.cs" />
     <Compile Include="Services\ImportService.cs" />
     <Compile Include="Services\PricingService.cs" />

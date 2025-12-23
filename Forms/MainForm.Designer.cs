@@ -21,7 +21,6 @@ namespace QuanLyTiemDaQuy.Forms
             this.btnLogout = new System.Windows.Forms.Button();
             this.btnUsers = new System.Windows.Forms.Button();
             this.btnReport = new System.Windows.Forms.Button();
-            this.btnInventory = new System.Windows.Forms.Button();
             this.btnImport = new System.Windows.Forms.Button();
             this.btnSales = new System.Windows.Forms.Button();
             this.btnSuppliers = new System.Windows.Forms.Button();
@@ -76,7 +75,6 @@ namespace QuanLyTiemDaQuy.Forms
             this.pnlSidebar.Controls.Add(this.btnLogout);
             this.pnlSidebar.Controls.Add(this.btnUsers);
             this.pnlSidebar.Controls.Add(this.btnReport);
-            this.pnlSidebar.Controls.Add(this.btnInventory);
             this.pnlSidebar.Controls.Add(this.btnImport);
             this.pnlSidebar.Controls.Add(this.btnSales);
             this.pnlSidebar.Controls.Add(this.btnSuppliers);
@@ -119,7 +117,7 @@ namespace QuanLyTiemDaQuy.Forms
             this.btnUsers.Padding = new System.Windows.Forms.Padding(15, 0, 0, 0);
             this.btnUsers.Size = new System.Drawing.Size(220, 45);
             this.btnUsers.TabIndex = 9;
-            this.btnUsers.Text = "👤  Tài khoản";
+            this.btnUsers.Text = "⚙️  Quản lý hệ thống";
             this.btnUsers.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnUsers.UseVisualStyleBackColor = true;
             this.btnUsers.Click += new System.EventHandler(this.btnUsers_Click);
@@ -140,23 +138,6 @@ namespace QuanLyTiemDaQuy.Forms
             this.btnReport.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnReport.UseVisualStyleBackColor = true;
             this.btnReport.Click += new System.EventHandler(this.btnReport_Click);
-            // 
-            // btnInventory
-            // 
-            this.btnInventory.Dock = System.Windows.Forms.DockStyle.Top;
-            this.btnInventory.FlatAppearance.BorderSize = 0;
-            this.btnInventory.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnInventory.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.btnInventory.ForeColor = System.Drawing.Color.Gainsboro;
-            this.btnInventory.Location = new System.Drawing.Point(0, 375);
-            this.btnInventory.Name = "btnInventory";
-            this.btnInventory.Padding = new System.Windows.Forms.Padding(15, 0, 0, 0);
-            this.btnInventory.Size = new System.Drawing.Size(220, 45);
-            this.btnInventory.TabIndex = 7;
-            this.btnInventory.Text = "📦  Tồn kho";
-            this.btnInventory.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnInventory.UseVisualStyleBackColor = true;
-            this.btnInventory.Click += new System.EventHandler(this.btnInventory_Click);
             // 
             // btnImport
             // 
@@ -621,7 +602,6 @@ namespace QuanLyTiemDaQuy.Forms
         private System.Windows.Forms.Button btnSuppliers;
         private System.Windows.Forms.Button btnSales;
         private System.Windows.Forms.Button btnImport;
-        private System.Windows.Forms.Button btnInventory;
         private System.Windows.Forms.Button btnReport;
         private System.Windows.Forms.Button btnUsers;
         private System.Windows.Forms.Button btnLogout;
