@@ -11,15 +11,15 @@ namespace QuanLyTiemDaQuy.Models
         public int ImportId { get; set; }
         public string ImportCode { get; set; } = string.Empty;
         public int SupplierId { get; set; }
-        public string SupplierName { get; set; } = string.Empty; // For display
+        public string SupplierName { get; set; } = string.Empty; // Để hiển thị
         public int EmployeeId { get; set; }
-        public string EmployeeName { get; set; } = string.Empty; // For display
+        public string EmployeeName { get; set; } = string.Empty; // Để hiển thị
         public DateTime ImportDate { get; set; } = DateTime.Now;
         public decimal TotalCost { get; set; }
         public string Note { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-        // Navigation property
+        // Thuộc tính điều hướng
         public List<ImportDetail> Details { get; set; } = new List<ImportDetail>();
 
         /// <summary>
@@ -43,8 +43,8 @@ namespace QuanLyTiemDaQuy.Models
         public int ImportDetailId { get; set; }
         public int ImportId { get; set; }
         public int ProductId { get; set; }
-        public string ProductCode { get; set; } = string.Empty; // For display
-        public string ProductName { get; set; } = string.Empty; // For display
+        public string ProductCode { get; set; } = string.Empty; // Để hiển thị
+        public string ProductName { get; set; } = string.Empty; // Để hiển thị
         public int Qty { get; set; }
         public decimal UnitCost { get; set; }
         public decimal LineTotal { get; set; }

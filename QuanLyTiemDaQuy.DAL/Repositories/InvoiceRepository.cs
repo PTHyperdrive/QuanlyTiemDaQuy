@@ -39,7 +39,7 @@ namespace QuanLyTiemDaQuy.DAL.Repositories
             var list = MapDataTableToList(dt);
             if (list.Count == 0) return null;
             
-            // Load details
+            // Tải chi tiết hoá đơn
             list[0].Details = GetInvoiceDetails(invoiceId);
             return list[0];
         }
@@ -129,7 +129,7 @@ namespace QuanLyTiemDaQuy.DAL.Repositories
             
             DatabaseHelper.ExecuteTransaction((connection, transaction) =>
             {
-                // Insert invoice header
+                // Thêm header hoá đơn
                 string insertInvoice = @"
                     INSERT INTO Invoices (InvoiceCode, CustomerId, EmployeeId, InvoiceDate, 
                         Subtotal, DiscountPercent, DiscountAmount, VAT, VATAmount, Total, PaymentMethod, Status, Note)
@@ -156,7 +156,7 @@ namespace QuanLyTiemDaQuy.DAL.Repositories
                     invoiceId = Convert.ToInt32(cmd.ExecuteScalar());
                 }
 
-                // Insert invoice details
+                // Thêm chi tiết hoá đơn
                 string insertDetail = @"
                     INSERT INTO InvoiceDetails (InvoiceId, ProductId, Qty, UnitPrice, LineTotal)
                     VALUES (@InvoiceId, @ProductId, @Qty, @UnitPrice, @LineTotal)";

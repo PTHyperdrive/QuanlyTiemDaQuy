@@ -23,14 +23,14 @@ namespace QuanLyTiemDaQuy.Models
         public int InvoiceId { get; set; }
         public string InvoiceCode { get; set; } = string.Empty;
         public int CustomerId { get; set; } // 0 = Khách lẻ
-        public string CustomerName { get; set; } // For display
+        public string CustomerName { get; set; } // Để hiển thị
         public int EmployeeId { get; set; }
-        public string EmployeeName { get; set; } // For display
+        public string EmployeeName { get; set; } // Để hiển thị
         public DateTime InvoiceDate { get; set; }
         public decimal Subtotal { get; set; }
         public decimal DiscountPercent { get; set; }
         public decimal DiscountAmount { get; set; }
-        public decimal VAT { get; set; } = 10; // Default 10%
+        public decimal VAT { get; set; } = 10; // Mặc định 10%
         public decimal VATAmount { get; set; }
         public decimal Total { get; set; }
         public string PaymentMethod { get; set; } = "Tiền mặt";
@@ -40,10 +40,10 @@ namespace QuanLyTiemDaQuy.Models
         public DateTime CancelledAt { get; set; }
         public string CancelReason { get; set; }
 
-        // Navigation property
+        // Thuộc tính điều hướng
         public List<InvoiceDetail> Details { get; set; } = new List<InvoiceDetail>();
 
-        // Computed properties
+        // Thuộc tính tính toán
         public bool IsPending { get { return Status == InvoiceStatus.Pending; } }
         public bool IsCompleted { get { return Status == InvoiceStatus.Completed; } }
         public bool IsCancelled { get { return Status == InvoiceStatus.Cancelled; } }
@@ -75,13 +75,13 @@ namespace QuanLyTiemDaQuy.Models
         public int InvoiceDetailId { get; set; }
         public int InvoiceId { get; set; }
         public int ProductId { get; set; }
-        public string ProductCode { get; set; } // For display
-        public string ProductName { get; set; } // For display
+        public string ProductCode { get; set; } // Để hiển thị
+        public string ProductName { get; set; } // Để hiển thị
         public int Qty { get; set; }
         public decimal UnitPrice { get; set; }
         public decimal LineTotal { get; set; }
 
-        // Computed if not set
+        // Tính nếu chưa được đặt
         public void CalculateLineTotal()
         {
             LineTotal = Qty * UnitPrice;
@@ -89,7 +89,7 @@ namespace QuanLyTiemDaQuy.Models
     }
 
     /// <summary>
-    /// Payment method constants
+    /// Hằng số phương thức thanh toán
     /// </summary>
     public static class PaymentMethods
     {

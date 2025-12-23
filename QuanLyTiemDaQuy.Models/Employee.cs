@@ -17,14 +17,14 @@ namespace QuanLyTiemDaQuy.Models
         public bool IsActive { get; set; } = true;
         public DateTime CreatedAt { get; set; }
 
-        // Role checking helpers
+        // Hỗ trợ kiểm tra vai trò
         public bool IsAdmin { get { return Role == "Admin"; } }
         public bool IsManager { get { return Role == "Manager" || IsAdmin; } }
         public bool IsSales { get { return Role == "Sales" || IsManager; } }
     }
 
     /// <summary>
-    /// Constants for employee roles
+    /// Hằng số cho các vai trò nhân viên
     /// </summary>
     public static class EmployeeRoles
     {
