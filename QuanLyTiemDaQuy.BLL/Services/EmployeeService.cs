@@ -20,7 +20,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
             _employeeRepository = new EmployeeRepository();
         }
 
-        #region Authentication
+        #region Xác thực
 
         /// <summary>
         /// Đăng nhập
@@ -89,7 +89,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
             if (newPassword.Length < 6)
                 return (false, "Mật khẩu phải có ít nhất 6 ký tự");
 
-            // Verify old password
+            // Xác minh mật khẩu cũ
             var employee = _employeeRepository.GetById(employeeId);
             if (employee == null)
                 return (false, "Không tìm thấy nhân viên");
@@ -114,7 +114,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
 
         #endregion
 
-        #region Employee CRUD
+        #region Quản lý nhân viên CRUD
 
         public List<Employee> GetAllEmployees()
         {
@@ -133,7 +133,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
 
         public (bool Success, string Message, int EmployeeId) AddEmployee(Employee employee, string password)
         {
-            // Validate
+            // Kiểm tra dữ liệu đầu vào
             if (string.IsNullOrWhiteSpace(employee.Name))
                 return (false, "Tên nhân viên không được để trống", 0);
 
@@ -148,7 +148,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
 
             try
             {
-                employee.PasswordHash = password; // Repository sẽ hash
+                employee.PasswordHash = password; // Repository sẽ mã hoá
                 int id = _employeeRepository.Insert(employee);
                 return (true, "Thêm nhân viên thành công", id);
             }

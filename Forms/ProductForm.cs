@@ -49,7 +49,7 @@ namespace QuanLyTiemDaQuy.Forms
         {
             try
             {
-                // Get filter values
+                // Lấy giá trị bộ lọc
                 string keyword = txtSearch.Text.Trim();
                 int? stoneTypeId = null;
                 if (cboStoneType.SelectedIndex > 0)
@@ -62,7 +62,7 @@ namespace QuanLyTiemDaQuy.Forms
                 if (decimal.TryParse(txtMinPrice.Text, out decimal min)) minPrice = min;
                 if (decimal.TryParse(txtMaxPrice.Text, out decimal max)) maxPrice = max;
 
-                // Search products
+                // Tìm kiếm sản phẩm
                 _products = _productService.SearchProducts(
                     keyword: string.IsNullOrEmpty(keyword) ? null : keyword,
                     stoneTypeId: stoneTypeId,
@@ -70,11 +70,11 @@ namespace QuanLyTiemDaQuy.Forms
                     maxPrice: maxPrice
                 );
 
-                // Bind to DataGridView
+                // Gán dữ liệu vào DataGridView
                 dgvProducts.DataSource = null;
                 dgvProducts.DataSource = _products;
 
-                // Format columns
+                // Định dạng các cột
                 FormatDataGridView();
 
                 lblStatus.Text = $"Tìm thấy {_products.Count} sản phẩm";
@@ -89,7 +89,7 @@ namespace QuanLyTiemDaQuy.Forms
         {
             if (dgvProducts.Columns.Count == 0) return;
 
-            // Hide some columns
+            // Ẩn một số cột
             string[] hiddenColumns = { "ProductId", "StoneTypeId", "CertId", "ImagePath", "UpdatedAt" };
             foreach (var col in hiddenColumns)
             {
@@ -97,7 +97,7 @@ namespace QuanLyTiemDaQuy.Forms
                     dgvProducts.Columns[col].Visible = false;
             }
 
-            // Set column headers
+            // Thiết lập tiêu đề cột
             if (dgvProducts.Columns.Contains("ProductCode"))
                 dgvProducts.Columns["ProductCode"].HeaderText = "Mã SP";
             if (dgvProducts.Columns.Contains("Name"))
@@ -129,7 +129,7 @@ namespace QuanLyTiemDaQuy.Forms
             if (dgvProducts.Columns.Contains("Status"))
                 dgvProducts.Columns["Status"].HeaderText = "Trạng thái";
 
-            // Highlight low stock
+            // Đánh dấu sản phẩm tồn kho thấp
             foreach (DataGridViewRow row in dgvProducts.Rows)
             {
                 if (row.DataBoundItem is Product product)

@@ -23,7 +23,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
             _customerRepository = new CustomerRepository();
         }
 
-        #region Sales Reports
+        #region Báo cáo bán hàng
 
         /// <summary>
         /// Báo cáo doanh thu theo ngày
@@ -148,7 +148,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
 
         #endregion
 
-        #region Inventory Reports
+        #region Báo cáo tồn kho
 
         /// <summary>
         /// Báo cáo tồn kho
@@ -211,31 +211,31 @@ namespace QuanLyTiemDaQuy.BLL.Services
         {
             var stats = new DashboardStats();
 
-            // Total products
+            // Tổng số sản phẩm
             var result = DatabaseHelper.ExecuteScalar("SELECT COUNT(*) FROM Products WHERE StockQty > 0");
             stats.TotalProducts = Convert.ToInt32(result);
 
-            // Low stock products
+            // Sản phẩm sắp hết hàng
             result = DatabaseHelper.ExecuteScalar("SELECT COUNT(*) FROM Products WHERE StockQty > 0 AND StockQty <= 5");
             stats.LowStockProducts = Convert.ToInt32(result);
 
-            // Total customers
+            // Tổng số khách hàng
             result = DatabaseHelper.ExecuteScalar("SELECT COUNT(*) FROM Customers");
             stats.TotalCustomers = Convert.ToInt32(result);
 
-            // Today's revenue
+            // Doanh thu hôm nay
             result = DatabaseHelper.ExecuteScalar(
                 "SELECT ISNULL(SUM(Total), 0) FROM Invoices WHERE CAST(InvoiceDate AS DATE) = @Today",
                 DatabaseHelper.CreateParameter("@Today", DateTime.Today));
             stats.TodayRevenue = Convert.ToDecimal(result);
 
-            // Today's invoices
+            // Số hoá đơn hôm nay
             result = DatabaseHelper.ExecuteScalar(
                 "SELECT COUNT(*) FROM Invoices WHERE CAST(InvoiceDate AS DATE) = @Today",
                 DatabaseHelper.CreateParameter("@Today", DateTime.Today));
             stats.TodayInvoices = Convert.ToInt32(result);
 
-            // This month's revenue
+            // Doanh thu tháng này
             var firstDayOfMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
             result = DatabaseHelper.ExecuteScalar(
                 "SELECT ISNULL(SUM(Total), 0) FROM Invoices WHERE InvoiceDate >= @FirstDay AND InvoiceDate < @NextMonth",
@@ -243,7 +243,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
                 DatabaseHelper.CreateParameter("@NextMonth", firstDayOfMonth.AddMonths(1)));
             stats.MonthRevenue = Convert.ToDecimal(result);
 
-            // This month's invoices
+            // Số hoá đơn tháng này
             result = DatabaseHelper.ExecuteScalar(
                 "SELECT COUNT(*) FROM Invoices WHERE InvoiceDate >= @FirstDay AND InvoiceDate < @NextMonth",
                 DatabaseHelper.CreateParameter("@FirstDay", firstDayOfMonth),

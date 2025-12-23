@@ -22,7 +22,7 @@ namespace QuanLyTiemDaQuy.Forms
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            // Set user info
+            // Thiết lập thông tin người dùng
             var employee = EmployeeService.CurrentEmployee;
             if (employee != null)
             {
@@ -30,13 +30,13 @@ namespace QuanLyTiemDaQuy.Forms
                 lblUserRole.Text = employee.Role;
             }
 
-            // Apply role-based menu visibility
+            // Áp dụng phân quyền hiển thị menu theo vai trò
             ApplyRolePermissions();
 
-            // Load dashboard stats
+            // Tải thống kê dashboard
             LoadDashboardStats();
 
-            // Set current date
+            // Thiết lập ngày hiện tại
             lblCurrentDate.Text = DateTime.Now.ToString("dddd, dd/MM/yyyy");
         }
 
@@ -45,10 +45,10 @@ namespace QuanLyTiemDaQuy.Forms
             var employee = EmployeeService.CurrentEmployee;
             if (employee == null) return;
 
-            // Only Admin can access User Management
+            // Chỉ Admin mới được truy cập Quản lý Tài khoản
             btnUsers.Visible = employee.IsAdmin;
 
-            // Only Manager+ can access Reports
+            // Chỉ Manager trở lên mới được truy cập Báo cáo
             btnReport.Visible = employee.IsManager;
         }
 
@@ -67,12 +67,12 @@ namespace QuanLyTiemDaQuy.Forms
             }
             catch (Exception ex)
             {
-                // Database might not be connected yet
+                // Có thể chưa kết nối được database
                 lblTodayRevenue.Text = "Lỗi kết nối DB";
             }
         }
 
-        #region Button Styling
+        #region Định dạng nút bấm
 
         private void ActivateButton(object btnSender)
         {
@@ -99,7 +99,7 @@ namespace QuanLyTiemDaQuy.Forms
 
         #endregion
 
-        #region Form Navigation
+        #region Điều hướng Form
 
         private void OpenChildForm(Form childForm)
         {
@@ -205,7 +205,7 @@ namespace QuanLyTiemDaQuy.Forms
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            // Logout when closing
+            // Đăng xuất khi đóng form
             _employeeService.Logout();
         }
     }

@@ -21,7 +21,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
             _customerRepository = new CustomerRepository();
         }
 
-        #region Invoice Operations
+        #region Thao tác hoá đơn
 
         public List<Invoice> GetAllInvoices()
         {
@@ -58,7 +58,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
 
         #endregion
 
-        #region Invoice Status Management
+        #region Quản lý trạng thái hoá đơn
 
         /// <summary>
         /// Hoàn thành hoá đơn (xuất hoá đơn)
@@ -78,7 +78,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
             bool success = _invoiceRepository.CompleteInvoice(invoiceId);
             if (success)
             {
-                // Update customer total purchase
+                // Cập nhật tổng mua của khách hàng
                 if (invoice.CustomerId > 0)
                 {
                     _customerRepository.UpdateTotalPurchase(invoice.CustomerId, invoice.Total);
@@ -111,7 +111,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
 
         #endregion
 
-        #region Create Invoice (Sale)
+        #region Tạo hoá đơn (Bán hàng)
 
         /// <summary>
         /// Tạo hóa đơn bán hàng với đầy đủ kiểm tra tồn kho
@@ -119,14 +119,14 @@ namespace QuanLyTiemDaQuy.BLL.Services
         /// </summary>
         public (bool Success, string Message, int InvoiceId) CreateInvoice(Invoice invoice, bool autoComplete = true)
         {
-            // Validate invoice
+            // Kiểm tra dữ liệu hoá đơn
             if (invoice.Details == null || invoice.Details.Count == 0)
                 return (false, "Hóa đơn phải có ít nhất 1 sản phẩm", 0);
 
             if (invoice.EmployeeId <= 0)
                 return (false, "Không xác định được nhân viên bán hàng", 0);
 
-            // Check stock availability for all items
+            // Kiểm tra tồn kho cho tất cả sản phẩm
             var stockErrors = new List<string>();
             foreach (var detail in invoice.Details)
             {
@@ -142,7 +142,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
                     stockErrors.Add($"{product.Name}: Yêu cầu {detail.Qty}, chỉ còn {product.StockQty}");
                 }
 
-                // Set product info for display
+                // Thiết lập thông tin sản phẩm để hiển thị
                 detail.ProductCode = product.ProductCode;
                 detail.ProductName = product.Name;
                 detail.UnitPrice = product.SellPrice;
@@ -154,10 +154,10 @@ namespace QuanLyTiemDaQuy.BLL.Services
                 return (false, "Không đủ tồn kho:\n" + string.Join("\n", stockErrors), 0);
             }
 
-            // Calculate totals
+            // Tính tổng tiền
             invoice.CalculateTotals();
 
-            // Generate invoice code
+            // Tạo mã hoá đơn
             if (string.IsNullOrEmpty(invoice.InvoiceCode))
             {
                 invoice.InvoiceCode = GenerateInvoiceCode();
@@ -168,10 +168,10 @@ namespace QuanLyTiemDaQuy.BLL.Services
 
             try
             {
-                // Insert invoice (trigger in DB will update stock)
+                // Chèn hoá đơn (trigger trong DB sẽ cập nhật tồn kho)
                 int invoiceId = _invoiceRepository.Insert(invoice);
 
-                // Update customer total purchase if completed and has customer
+                // Cập nhật tổng mua của khách hàng nếu đã hoàn thành và có khách hàng
                 if (autoComplete && invoice.CustomerId > 0)
                 {
                     _customerRepository.UpdateTotalPurchase(invoice.CustomerId, invoice.Total);
@@ -201,7 +201,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
             if (product == null)
                 return (false, $"Không tìm thấy sản phẩm với mã '{productCode}'", null);
 
-            // Check current qty in cart
+            // Kiểm tra số lượng hiện tại trong giỏ hàng
             int currentCartQty = 0;
             foreach (var item in currentCart)
             {
@@ -245,7 +245,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
 
         #endregion
 
-        #region Statistics
+        #region Thống kê
 
         /// <summary>
         /// Lấy doanh thu hôm nay (chỉ tính hoá đơn đã xuất)

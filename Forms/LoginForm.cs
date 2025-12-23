@@ -40,12 +40,12 @@ namespace QuanLyTiemDaQuy.Forms
                 return;
             }
 
-            // Attempt login
+            // Thực hiện đăng nhập
             var result = _employeeService.Login(username, password);
 
             if (result.Success)
             {
-                // Open main form
+                // Mở form chính
                 this.Hide();
                 var mainForm = new MainForm();
                 mainForm.FormClosed += (s, args) => this.Close();

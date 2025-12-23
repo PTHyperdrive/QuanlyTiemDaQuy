@@ -103,7 +103,7 @@ namespace QuanLyTiemDaQuy.Forms
             if (dgvEmployees.Columns.Contains("CreatedAt"))
                 dgvEmployees.Columns["CreatedAt"].HeaderText = "Ngày tạo";
 
-            // Highlight inactive rows
+            // Đánh dấu các dòng không hoạt động
             foreach (DataGridViewRow row in dgvEmployees.Rows)
             {
                 var emp = row.DataBoundItem as Employee;
@@ -286,7 +286,7 @@ namespace QuanLyTiemDaQuy.Forms
                 return;
             }
 
-            string newPassword = "123456"; // Default password
+            string newPassword = "123456"; // Mật khẩu mặc định
             
             var confirm = MessageBox.Show(
                 $"Reset mật khẩu cho '{_selectedEmployee.Username}' về '{newPassword}'?",

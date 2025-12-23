@@ -21,7 +21,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
             _certificateRepository = new CertificateRepository();
         }
 
-        #region Product CRUD
+        #region Quản lý sản phẩm CRUD
 
         public List<Product> GetAllProducts()
         {
@@ -150,7 +150,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
             }
             catch (Exception ex)
             {
-                // Có thể fail do FK constraint
+                // Có thể thất bại do ràng buộc khoá ngoại
                 if (ex.Message.Contains("REFERENCE"))
                     return (false, "Không thể xóa sản phẩm đã có phiếu nhập hoặc hóa đơn");
                 return (false, $"Lỗi khi xóa sản phẩm: {ex.Message}");
@@ -159,7 +159,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
 
         #endregion
 
-        #region Stone Types
+        #region Loại đá quý
 
         public List<StoneType> GetAllStoneTypes()
         {
@@ -184,7 +184,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
 
         #endregion
 
-        #region Certificates
+        #region Chứng nhận
 
         public List<Certificate> GetAllCertificates()
         {
@@ -212,7 +212,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
 
         #endregion
 
-        #region Inventory
+        #region Quản lý tồn kho
 
         /// <summary>
         /// Kiểm tra tồn kho có đủ để bán không
