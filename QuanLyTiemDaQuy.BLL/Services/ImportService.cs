@@ -21,7 +21,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
             _supplierRepository = new SupplierRepository();
         }
 
-        #region Thao tác phiếu nhập
+        #region Import Receipt Operations
 
         public List<ImportReceipt> GetAllImports()
         {
@@ -45,7 +45,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
 
         #endregion
 
-        #region Tạo phiếu nhập
+        #region Create Import Receipt
 
         /// <summary>
         /// Tạo phiếu nhập hàng
@@ -53,7 +53,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
         /// </summary>
         public (bool Success, string Message, int ImportId) CreateImportReceipt(ImportReceipt receipt)
         {
-            // Kiểm tra dữ liệu đầu vào
+            // Validate
             if (receipt.SupplierId <= 0)
                 return (false, "Vui lòng chọn nhà cung cấp", 0);
 
@@ -63,7 +63,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
             if (receipt.EmployeeId <= 0)
                 return (false, "Không xác định được nhân viên tạo phiếu", 0);
 
-            // Kiểm tra từng chi tiết và tính tổng
+            // Validate each detail and calculate totals
             decimal totalCost = 0;
             foreach (var detail in receipt.Details)
             {
@@ -86,7 +86,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
             receipt.TotalCost = totalCost;
             receipt.ImportDate = DateTime.Now;
 
-            // Tạo mã phiếu nhập
+            // Generate code
             if (string.IsNullOrEmpty(receipt.ImportCode))
             {
                 receipt.ImportCode = GenerateImportCode();
@@ -96,14 +96,14 @@ namespace QuanLyTiemDaQuy.BLL.Services
             {
                 int importId = _importRepository.Insert(receipt);
 
-                // Tuỳ chọn cập nhật giá vốn nếu giá nhập khác
+                // Optionally update cost price if import price is different
                 foreach (var detail in receipt.Details)
                 {
                     var product = _productRepository.GetById(detail.ProductId);
                     if (product != null && detail.UnitCost != product.CostPrice)
                     {
-                        // Có thể cập nhật giá vốn tại đây nếu cần
-                        // Hiện tại, giữ nguyên giá vốn ban đầu
+                        // Could update cost price here if needed
+                        // For now, we keep the original cost price
                     }
                 }
 
@@ -166,7 +166,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
 
         #endregion
 
-        #region Thống kê
+        #region Statistics
 
         /// <summary>
         /// Lấy tổng chi phí nhập hàng trong khoảng thời gian

@@ -15,8 +15,29 @@ namespace QuanLyTiemDaQuy
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             
-            // Khởi động với LoginForm
-            Application.Run(new LoginForm());
+            // Loop để handle logout -> quay lại login
+            bool continueRunning = true;
+            while (continueRunning)
+            {
+                var loginForm = new LoginForm();
+                Application.Run(loginForm);
+                
+                // Nếu login thành công, mở MainForm
+                if (loginForm.DialogResult == DialogResult.OK)
+                {
+                    var mainForm = new MainForm();
+                    Application.Run(mainForm);
+                    
+                    // Nếu MainForm đóng vì logout, tiếp tục vòng lặp
+                    // Nếu đóng vì exit, thoát vòng lặp
+                    continueRunning = mainForm.ReturnToLogin;
+                }
+                else
+                {
+                    // Cancel login -> thoát hoàn toàn
+                    continueRunning = false;
+                }
+            }
         }
     }
 }

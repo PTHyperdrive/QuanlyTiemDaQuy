@@ -15,16 +15,22 @@ namespace QuanLyTiemDaQuy.Models
         public string Phone { get; set; }
         public string Email { get; set; }
         public bool IsActive { get; set; } = true;
+        public bool MustChangePassword { get; set; } = false;
+        public int BranchId { get; set; } // Chi nhánh được phân công
+        public string BranchName { get; set; } // For display
         public DateTime CreatedAt { get; set; }
 
-        // Hỗ trợ kiểm tra vai trò
+        // Role checking helpers
         public bool IsAdmin { get { return Role == "Admin"; } }
         public bool IsManager { get { return Role == "Manager" || IsAdmin; } }
         public bool IsSales { get { return Role == "Sales" || IsManager; } }
+        
+        // Admin có quyền truy cập tất cả chi nhánh
+        public bool HasFullBranchAccess { get { return IsAdmin; } }
     }
 
     /// <summary>
-    /// Hằng số cho các vai trò nhân viên
+    /// Constants for employee roles
     /// </summary>
     public static class EmployeeRoles
     {

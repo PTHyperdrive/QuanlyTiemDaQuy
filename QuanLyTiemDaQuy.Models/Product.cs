@@ -11,7 +11,7 @@ namespace QuanLyTiemDaQuy.Models
         public string ProductCode { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public int StoneTypeId { get; set; }
-        public string StoneTypeName { get; set; } // Để hiển thị
+        public string StoneTypeName { get; set; } // For display
         public decimal Carat { get; set; }
         public string Color { get; set; }
         public string Clarity { get; set; }
@@ -22,12 +22,12 @@ namespace QuanLyTiemDaQuy.Models
         public string Status { get; set; } = "Còn hàng";
         public string ImagePath { get; set; }
         public int CertId { get; set; }
-        public string CertCode { get; set; } // Để hiển thị
+        public string CertCode { get; set; } // For display
         public string DisplayLocation { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 
-        // Thuộc tính tính toán
+        // Computed properties
         public decimal Profit { get { return SellPrice - CostPrice; } }
         public decimal ProfitMargin { get { return CostPrice > 0 ? (Profit / CostPrice) * 100 : 0; } }
         public bool IsLowStock { get { return StockQty <= 5 && StockQty > 0; } }

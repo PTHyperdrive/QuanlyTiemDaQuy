@@ -98,7 +98,7 @@ namespace QuanLyTiemDaQuy.DAL.Repositories
             
             DatabaseHelper.ExecuteTransaction((connection, transaction) =>
             {
-                // Thêm header phiếu nhập
+                // Insert receipt header
                 string insertReceipt = @"
                     INSERT INTO ImportReceipts (ImportCode, SupplierId, EmployeeId, ImportDate, TotalCost, Note)
                     VALUES (@ImportCode, @SupplierId, @EmployeeId, @ImportDate, @TotalCost, @Note);

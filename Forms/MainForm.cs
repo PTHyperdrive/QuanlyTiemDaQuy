@@ -13,6 +13,9 @@ namespace QuanLyTiemDaQuy.Forms
         private Button currentButton;
         private Form activeForm;
 
+        // Flag to indicate return to login screen vs exit app
+        public bool ReturnToLogin { get; private set; } = false;
+
         public MainForm()
         {
             InitializeComponent();
@@ -22,7 +25,7 @@ namespace QuanLyTiemDaQuy.Forms
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            // Thiết lập thông tin người dùng
+            // Set user info
             var employee = EmployeeService.CurrentEmployee;
             if (employee != null)
             {
@@ -30,13 +33,13 @@ namespace QuanLyTiemDaQuy.Forms
                 lblUserRole.Text = employee.Role;
             }
 
-            // Áp dụng phân quyền hiển thị menu theo vai trò
+            // Apply role-based menu visibility
             ApplyRolePermissions();
 
-            // Tải thống kê dashboard
+            // Load dashboard stats
             LoadDashboardStats();
 
-            // Thiết lập ngày hiện tại
+            // Set current date
             lblCurrentDate.Text = DateTime.Now.ToString("dddd, dd/MM/yyyy");
         }
 
@@ -45,10 +48,10 @@ namespace QuanLyTiemDaQuy.Forms
             var employee = EmployeeService.CurrentEmployee;
             if (employee == null) return;
 
-            // Chỉ Admin mới được truy cập Quản lý Tài khoản
-            btnUsers.Visible = employee.IsAdmin;
+            // Admin and Manager can access User Management
+            btnUsers.Visible = employee.IsAdmin || employee.IsManager;
 
-            // Chỉ Manager trở lên mới được truy cập Báo cáo
+            // Only Manager+ can access Reports
             btnReport.Visible = employee.IsManager;
         }
 
@@ -67,12 +70,12 @@ namespace QuanLyTiemDaQuy.Forms
             }
             catch (Exception ex)
             {
-                // Có thể chưa kết nối được database
+                // Database might not be connected yet
                 lblTodayRevenue.Text = "Lỗi kết nối DB";
             }
         }
 
-        #region Định dạng nút bấm
+        #region Button Styling
 
         private void ActivateButton(object btnSender)
         {
@@ -99,7 +102,7 @@ namespace QuanLyTiemDaQuy.Forms
 
         #endregion
 
-        #region Điều hướng Form
+        #region Form Navigation
 
         private void OpenChildForm(Form childForm)
         {
@@ -158,28 +161,28 @@ namespace QuanLyTiemDaQuy.Forms
         {
             ActivateButton(sender);
             pnlDashboard.Visible = false;
-            MessageBox.Show("Module Quản lý Tài khoản sẽ được phát triển!", "Thông báo");
+            OpenChildForm(new UserManagementForm());
         }
 
         private void btnReport_Click(object sender, EventArgs e)
         {
             ActivateButton(sender);
             pnlDashboard.Visible = false;
-            MessageBox.Show("Module Báo cáo sẽ được phát triển!", "Thông báo");
+            OpenChildForm(new ReportForm());
         }
 
         private void btnImport_Click(object sender, EventArgs e)
         {
             ActivateButton(sender);
             pnlDashboard.Visible = false;
-            MessageBox.Show("Module Nhập hàng sẽ được phát triển!", "Thông báo");
+            OpenChildForm(new ImportForm());
         }
 
         private void btnSuppliers_Click(object sender, EventArgs e)
         {
             ActivateButton(sender);
             pnlDashboard.Visible = false;
-            MessageBox.Show("Module Nhà cung cấp sẽ được phát triển!", "Thông báo");
+            OpenChildForm(new SupplierForm());
         }
 
         private void btnInventory_Click(object sender, EventArgs e)
@@ -199,14 +202,32 @@ namespace QuanLyTiemDaQuy.Forms
             if (result == DialogResult.Yes)
             {
                 _employeeService.Logout();
+                ReturnToLogin = true; // Signal to return to login screen
                 this.Close();
             }
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            // Đăng xuất khi đóng form
+            // Logout when closing
             _employeeService.Logout();
+            // If not explicitly logging out, don't return to login (user closed window)
+            // ReturnToLogin remains false unless set by logout button
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lblLowStock_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void pnlStats_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
 }

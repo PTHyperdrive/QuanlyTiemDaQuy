@@ -15,7 +15,7 @@ namespace QuanLyTiemDaQuy.Forms
         private List<InvoiceDetail> _cart;
         private Invoice _currentInvoice;
 
-        // Thành phần tự động hoàn thành
+        // Autocomplete components
         private ListBox lstProductSuggestions;
         private List<Product> _allProducts;
 
@@ -33,7 +33,7 @@ namespace QuanLyTiemDaQuy.Forms
 
         private void SetupAutocomplete()
         {
-            // Tạo listbox gợi ý
+            // Create suggestion listbox
             lstProductSuggestions = new ListBox();
             lstProductSuggestions.BackColor = Color.FromArgb(50, 50, 70);
             lstProductSuggestions.ForeColor = Color.White;
@@ -45,11 +45,11 @@ namespace QuanLyTiemDaQuy.Forms
             lstProductSuggestions.Click += LstProductSuggestions_Click;
             lstProductSuggestions.KeyDown += LstProductSuggestions_KeyDown;
             
-            // Thêm vào form
+            // Add to form
             this.Controls.Add(lstProductSuggestions);
             lstProductSuggestions.BringToFront();
 
-            // Gán sự kiện cho textbox
+            // Wire up textbox events
             txtProductCode.TextChanged += TxtProductCode_TextChanged;
             txtProductCode.Leave += TxtProductCode_Leave;
             txtProductCode.KeyDown += TxtProductCode_KeyDown;
@@ -86,7 +86,7 @@ namespace QuanLyTiemDaQuy.Forms
                 return;
             }
 
-            // Lọc sản phẩm bắt đầu với từ khóa tìm kiếm
+            // Filter products starting with search text
             var matches = new List<Product>();
             foreach (var p in _allProducts)
             {
@@ -106,7 +106,7 @@ namespace QuanLyTiemDaQuy.Forms
                     lstProductSuggestions.Items.Add($"{p.ProductCode} - {p.Name} ({p.StockQty} còn) - {p.SellPrice:N0}đ");
                 }
 
-                // Đặt vị trí listbox bên dưới textbox
+                // Position listbox below textbox
                 Point txtLocation = txtProductCode.Parent.PointToScreen(txtProductCode.Location);
                 Point formLocation = this.PointToClient(txtLocation);
                 lstProductSuggestions.Location = new Point(formLocation.X, formLocation.Y + txtProductCode.Height + 2);
@@ -163,13 +163,13 @@ namespace QuanLyTiemDaQuy.Forms
             if (lstProductSuggestions.SelectedItem != null)
             {
                 string selectedText = lstProductSuggestions.SelectedItem.ToString();
-                // Trích xuất mã sản phẩm (trước dấu " - " đầu tiên)
+                // Extract product code (before the first " - ")
                 int dashIndex = selectedText.IndexOf(" - ");
                 if (dashIndex > 0)
                 {
                     string productCode = selectedText.Substring(0, dashIndex);
                     
-                    // Tạm thời gỡ bỏ event handler để tránh đệ quy
+                    // Temporarily remove event handler to avoid recursion
                     txtProductCode.TextChanged -= TxtProductCode_TextChanged;
                     txtProductCode.Text = productCode;
                     txtProductCode.TextChanged += TxtProductCode_TextChanged;
@@ -183,7 +183,7 @@ namespace QuanLyTiemDaQuy.Forms
 
         private void TxtProductCode_Leave(object sender, EventArgs e)
         {
-            // Ẩn gợi ý sau một khoảng thời gian ngắn (để cho phép click vào list)
+            // Hide suggestions after a short delay (to allow click on list)
             Timer hideTimer = new Timer();
             hideTimer.Interval = 200;
             hideTimer.Tick += (s, args) =>
@@ -228,7 +228,7 @@ namespace QuanLyTiemDaQuy.Forms
 
             if (result.Success && result.Detail != null)
             {
-                // Kiểm tra sản phẩm đã có trong giỏ hàng chưa
+                // Check if product already in cart
                 bool found = false;
                 foreach (var item in _cart)
                 {
@@ -249,7 +249,7 @@ namespace QuanLyTiemDaQuy.Forms
                 RefreshCart();
                 UpdateTotals();
                 
-                // Xóa và focus lại
+                // Clear and refocus
                 txtProductCode.TextChanged -= TxtProductCode_TextChanged;
                 txtProductCode.Clear();
                 txtProductCode.TextChanged += TxtProductCode_TextChanged;
@@ -352,7 +352,7 @@ namespace QuanLyTiemDaQuy.Forms
                 return;
             }
 
-            // Chuẩn bị hoá đơn
+            // Prepare invoice
             var invoice = new Invoice
             {
                 Details = new List<InvoiceDetail>(_cart),
@@ -362,30 +362,30 @@ namespace QuanLyTiemDaQuy.Forms
                 EmployeeId = EmployeeService.CurrentEmployee?.EmployeeId ?? 1
             };
 
-            // Thiết lập khách hàng
+            // Set customer
             var selectedCustomer = cboCustomer.SelectedItem as Customer;
             if (selectedCustomer != null && selectedCustomer.CustomerId > 0)
             {
                 invoice.CustomerId = selectedCustomer.CustomerId;
             }
 
-            // Tạo hoá đơn
+            // Create invoice
             var result = _salesService.CreateInvoice(invoice);
 
             if (result.Success)
             {
                 MessageBox.Show(result.Message, "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                // Xóa giỏ hàng
+                // Clear cart
                 _cart.Clear();
                 RefreshCart();
                 UpdateTotals();
                 cboCustomer.SelectedIndex = 0;
                 
-                // Tải lại sản phẩm để cập nhật tồn kho
+                // Reload products to refresh stock
                 LoadProducts();
 
-                // TODO: In hoá đơn
+                // TODO: Print invoice
             }
             else
             {
@@ -418,5 +418,144 @@ namespace QuanLyTiemDaQuy.Forms
                 e.Handled = true;
             }
         }
+
+        #region Pending Invoice Workflow
+
+        /// <summary>
+        /// Lưu hoá đơn đang chờ thanh toán (mỗi chi nhánh chỉ 1 HĐ pending)
+        /// </summary>
+        private void btnSavePending_Click(object sender, EventArgs e)
+        {
+            if (_cart.Count == 0)
+            {
+                MessageBox.Show("Giỏ hàng trống!", "Thông báo");
+                return;
+            }
+
+            int branchId = EmployeeService.CurrentEmployee?.BranchId ?? 1;
+
+            // Kiểm tra đã có HĐ pending chưa
+            if (_salesService.HasPendingInvoice(branchId))
+            {
+                MessageBox.Show("Chi nhánh đã có 1 hoá đơn đang chờ thanh toán!\nVui lòng hoàn thành hoặc huỷ hoá đơn đó trước.", 
+                    "Không thể lưu", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Tạo hoá đơn pending (không auto complete)
+            var invoice = new Invoice
+            {
+                Details = new List<InvoiceDetail>(_cart),
+                DiscountPercent = (decimal)nudDiscount.Value,
+                VAT = (decimal)nudVAT.Value,
+                PaymentMethod = cboPaymentMethod.SelectedItem?.ToString() ?? "Tiền mặt",
+                EmployeeId = EmployeeService.CurrentEmployee?.EmployeeId ?? 1,
+                BranchId = branchId,
+                Status = InvoiceStatus.Pending
+            };
+
+            var selectedCustomer = cboCustomer.SelectedItem as Customer;
+            if (selectedCustomer != null && selectedCustomer.CustomerId > 0)
+            {
+                invoice.CustomerId = selectedCustomer.CustomerId;
+            }
+
+            var result = _salesService.CreateInvoice(invoice, autoComplete: false);
+
+            if (result.Success)
+            {
+                MessageBox.Show($"Đã lưu hoá đơn chờ thanh toán!\nMã HĐ: {result.Message}", "Thành công", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                
+                _cart.Clear();
+                RefreshCart();
+                UpdateTotals();
+                cboCustomer.SelectedIndex = 0;
+                LoadProducts();
+            }
+            else
+            {
+                MessageBox.Show(result.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// Lấy lại hoá đơn đang chờ thanh toán của chi nhánh
+        /// </summary>
+        private void btnResumePending_Click(object sender, EventArgs e)
+        {
+            int branchId = EmployeeService.CurrentEmployee?.BranchId ?? 1;
+            
+            var pendingInvoice = _salesService.GetPendingInvoiceByBranch(branchId);
+            if (pendingInvoice == null)
+            {
+                MessageBox.Show("Không có hoá đơn đang chờ thanh toán!", "Thông báo");
+                return;
+            }
+
+            // Load invoice details into cart
+            _cart.Clear();
+            if (pendingInvoice.Details != null)
+            {
+                foreach (var detail in pendingInvoice.Details)
+                {
+                    _cart.Add(detail);
+                }
+            }
+
+            // Set form values
+            nudDiscount.Value = pendingInvoice.DiscountPercent;
+            nudVAT.Value = pendingInvoice.VAT;
+            
+            // Find and select customer
+            for (int i = 0; i < cboCustomer.Items.Count; i++)
+            {
+                var customer = cboCustomer.Items[i] as Customer;
+                if (customer != null && customer.CustomerId == pendingInvoice.CustomerId)
+                {
+                    cboCustomer.SelectedIndex = i;
+                    break;
+                }
+            }
+
+            RefreshCart();
+            UpdateTotals();
+
+            MessageBox.Show($"Đã lấy lại hoá đơn: {pendingInvoice.InvoiceCode}", "Thông tin", 
+                MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        /// <summary>
+        /// Huỷ hoá đơn đang chờ thanh toán
+        /// </summary>
+        private void btnCancelPending_Click(object sender, EventArgs e)
+        {
+            int branchId = EmployeeService.CurrentEmployee?.BranchId ?? 1;
+            
+            var pendingInvoice = _salesService.GetPendingInvoiceByBranch(branchId);
+            if (pendingInvoice == null)
+            {
+                MessageBox.Show("Không có hoá đơn đang chờ thanh toán để huỷ!", "Thông báo");
+                return;
+            }
+
+            var confirm = MessageBox.Show(
+                $"Huỷ hoá đơn chờ thanh toán?\nMã HĐ: {pendingInvoice.InvoiceCode}\nTổng: {pendingInvoice.Total:N0} VNĐ",
+                "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (confirm == DialogResult.Yes)
+            {
+                var result = _salesService.CancelInvoice(pendingInvoice.InvoiceId, "Khách không thanh toán");
+                MessageBox.Show(result.Message, result.Success ? "Thành công" : "Lỗi",
+                    MessageBoxButtons.OK, result.Success ? MessageBoxIcon.Information : MessageBoxIcon.Error);
+
+                if (result.Success)
+                {
+                    LoadProducts(); // Refresh stock
+                }
+            }
+        }
+
+        #endregion
     }
 }

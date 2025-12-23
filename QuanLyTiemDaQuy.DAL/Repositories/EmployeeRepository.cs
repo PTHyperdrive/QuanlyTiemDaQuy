@@ -68,8 +68,8 @@ namespace QuanLyTiemDaQuy.DAL.Repositories
         public int Insert(Employee employee)
         {
             string query = @"
-                INSERT INTO Employees (Name, Username, PasswordHash, Role, Phone, Email, IsActive) 
-                VALUES (@Name, @Username, @PasswordHash, @Role, @Phone, @Email, @IsActive);
+                INSERT INTO Employees (Name, Username, PasswordHash, Role, Phone, Email, IsActive, BranchId) 
+                VALUES (@Name, @Username, @PasswordHash, @Role, @Phone, @Email, @IsActive, @BranchId);
                 SELECT SCOPE_IDENTITY();";
             
             var result = DatabaseHelper.ExecuteScalar(query,
@@ -79,7 +79,8 @@ namespace QuanLyTiemDaQuy.DAL.Repositories
                 DatabaseHelper.CreateParameter("@Role", employee.Role),
                 DatabaseHelper.CreateParameter("@Phone", employee.Phone),
                 DatabaseHelper.CreateParameter("@Email", employee.Email),
-                DatabaseHelper.CreateParameter("@IsActive", employee.IsActive));
+                DatabaseHelper.CreateParameter("@IsActive", employee.IsActive),
+                DatabaseHelper.CreateParameter("@BranchId", employee.BranchId));
             
             return Convert.ToInt32(result);
         }
@@ -93,7 +94,8 @@ namespace QuanLyTiemDaQuy.DAL.Repositories
                     Role = @Role, 
                     Phone = @Phone, 
                     Email = @Email, 
-                    IsActive = @IsActive
+                    IsActive = @IsActive,
+                    BranchId = @BranchId
                 WHERE EmployeeId = @EmployeeId";
             
             int affected = DatabaseHelper.ExecuteNonQuery(query,
@@ -103,7 +105,8 @@ namespace QuanLyTiemDaQuy.DAL.Repositories
                 DatabaseHelper.CreateParameter("@Role", employee.Role),
                 DatabaseHelper.CreateParameter("@Phone", employee.Phone),
                 DatabaseHelper.CreateParameter("@Email", employee.Email),
-                DatabaseHelper.CreateParameter("@IsActive", employee.IsActive));
+                DatabaseHelper.CreateParameter("@IsActive", employee.IsActive),
+                DatabaseHelper.CreateParameter("@BranchId", employee.BranchId));
             
             return affected > 0;
         }
@@ -123,6 +126,15 @@ namespace QuanLyTiemDaQuy.DAL.Repositories
         {
             // Soft delete - chỉ vô hiệu hóa
             string query = "UPDATE Employees SET IsActive = 0 WHERE EmployeeId = @EmployeeId";
+            int affected = DatabaseHelper.ExecuteNonQuery(query,
+                DatabaseHelper.CreateParameter("@EmployeeId", employeeId));
+            return affected > 0;
+        }
+
+        public bool Activate(int employeeId)
+        {
+            // Kích hoạt lại tài khoản
+            string query = "UPDATE Employees SET IsActive = 1 WHERE EmployeeId = @EmployeeId";
             int affected = DatabaseHelper.ExecuteNonQuery(query,
                 DatabaseHelper.CreateParameter("@EmployeeId", employeeId));
             return affected > 0;

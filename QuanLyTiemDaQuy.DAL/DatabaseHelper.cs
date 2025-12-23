@@ -5,16 +5,13 @@ using System.Data.SqlClient;
 namespace QuanLyTiemDaQuy.DAL
 {
     /// <summary>
-    /// Helper class để kết nối và thao tác với SQL Server
+    /// Helper class để kết nối và thao tác với SQL Server Express
     /// </summary>
     public static class DatabaseHelper
     {
-        // Connection string cho SQL Server
-        // Sử dụng Windows Authentication (local):
+        // Connection string cho SQL Server Express 2025
+        // Thay đổi server name nếu cần (.\SQLEXPRESS hoặc localhost\SQLEXPRESS)
         private static string _connectionString = @"Data Source=.\SQLEXPRESS2025;Initial Catalog=QuanLyTiemDaQuy;Integrated Security=True;TrustServerCertificate=True";
-        
-        // Sử dụng SQL Authentication (external server):
-        // private static string _connectionString = @"Data Source=<IP>,1433;Initial Catalog=QuanLyTiemDaQuy;User ID=<username>;Password=<password>;TrustServerCertificate=True";
 
         /// <summary>
         /// Lấy hoặc set connection string
@@ -24,7 +21,6 @@ namespace QuanLyTiemDaQuy.DAL
             get => _connectionString;
             set => _connectionString = value;
         }
-
 
         /// <summary>
         /// Tạo và mở một SqlConnection mới

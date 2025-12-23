@@ -11,6 +11,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
     public class EmployeeService
     {
         private readonly EmployeeRepository _employeeRepository;
+        private readonly BranchRepository _branchRepository;
         
         // Lưu thông tin nhân viên đang đăng nhập
         public static Employee? CurrentEmployee { get; private set; }
@@ -18,9 +19,10 @@ namespace QuanLyTiemDaQuy.BLL.Services
         public EmployeeService()
         {
             _employeeRepository = new EmployeeRepository();
+            _branchRepository = new BranchRepository();
         }
 
-        #region Xác thực
+        #region Authentication
 
         /// <summary>
         /// Đăng nhập
@@ -89,7 +91,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
             if (newPassword.Length < 6)
                 return (false, "Mật khẩu phải có ít nhất 6 ký tự");
 
-            // Xác minh mật khẩu cũ
+            // Verify old password
             var employee = _employeeRepository.GetById(employeeId);
             if (employee == null)
                 return (false, "Không tìm thấy nhân viên");
@@ -114,7 +116,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
 
         #endregion
 
-        #region Quản lý nhân viên CRUD
+        #region Employee CRUD
 
         public List<Employee> GetAllEmployees()
         {
@@ -133,7 +135,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
 
         public (bool Success, string Message, int EmployeeId) AddEmployee(Employee employee, string password)
         {
-            // Kiểm tra dữ liệu đầu vào
+            // Validate
             if (string.IsNullOrWhiteSpace(employee.Name))
                 return (false, "Tên nhân viên không được để trống", 0);
 
@@ -148,7 +150,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
 
             try
             {
-                employee.PasswordHash = password; // Repository sẽ mã hoá
+                employee.PasswordHash = password; // Repository sẽ hash
                 int id = _employeeRepository.Insert(employee);
                 return (true, "Thêm nhân viên thành công", id);
             }
@@ -203,6 +205,22 @@ namespace QuanLyTiemDaQuy.BLL.Services
             }
         }
 
+        public (bool Success, string Message) ActivateEmployee(int employeeId)
+        {
+            try
+            {
+                bool success = _employeeRepository.Activate(employeeId);
+                if (success)
+                    return (true, "Kích hoạt nhân viên thành công");
+                else
+                    return (false, "Không tìm thấy nhân viên");
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Lỗi: {ex.Message}");
+            }
+        }
+
         /// <summary>
         /// Reset mật khẩu (chỉ Admin)
         /// </summary>
@@ -229,5 +247,26 @@ namespace QuanLyTiemDaQuy.BLL.Services
         }
 
         #endregion
+
+        #region Branch Operations
+
+        /// <summary>
+        /// Lấy danh sách tất cả chi nhánh
+        /// </summary>
+        public List<Branch> GetAllBranches()
+        {
+            return _branchRepository.GetAll();
+        }
+
+        /// <summary>
+        /// Lấy danh sách chi nhánh đang hoạt động
+        /// </summary>
+        public List<Branch> GetActiveBranches()
+        {
+            return _branchRepository.GetActive();
+        }
+
+        #endregion
     }
 }
+

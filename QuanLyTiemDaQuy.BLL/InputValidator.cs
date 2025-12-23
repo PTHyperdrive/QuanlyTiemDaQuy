@@ -122,17 +122,24 @@ namespace QuanLyTiemDaQuy.BLL
 
         /// <summary>
         /// Validate Email
+        /// Cho phép format: name@domain.com hoặc name.surname@domain.com
         /// </summary>
         public static (bool IsValid, string Message) ValidateEmail(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
                 return (true, string.Empty); // Email có thể để trống
 
-            if (!Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
-                return (false, "Email không đúng định dạng");
+            // Pattern cho phép: name@domain.ext hoặc name.surname@domain.ext
+            // name/surname: chữ cái, số, dấu gạch dưới, dấu chấm
+            // domain: chữ cái, số, có thể có subdomain
+            // ext: ít nhất 2 ký tự
+            string emailPattern = @"^[a-zA-Z0-9_]+(\.[a-zA-Z0-9_]+)*@[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*\.[a-zA-Z]{2,}$";
+            
+            if (!Regex.IsMatch(email, emailPattern))
+                return (false, "Email không đúng định dạng (VD: ten@domain.com hoặc ten.ho@domain.com)");
 
-            if (ContainsSqlInjection(email))
-                return (false, "Email chứa ký tự không hợp lệ");
+            if (email.Length > 100)
+                return (false, "Email không được quá 100 ký tự");
 
             return (true, string.Empty);
         }

@@ -52,9 +52,3 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
-
-# Database credentials scripts (IMPORTANT: never commit these!)
-setup-db-env.bat
-setup-db-permanent.bat
-*.local.bat
-appsettings.local.json

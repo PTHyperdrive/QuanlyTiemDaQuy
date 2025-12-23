@@ -339,7 +339,7 @@ namespace QuanLyTiemDaQuy.Forms
             this.lblTitle.ForeColor = System.Drawing.Color.White;
             this.lblTitle.Location = new System.Drawing.Point(15, 13);
             this.lblTitle.Name = "lblTitle";
-            this.lblTitle.Size = new System.Drawing.Size(124, 30);
+            this.lblTitle.Size = new System.Drawing.Size(126, 30);
             this.lblTitle.TabIndex = 0;
             this.lblTitle.Text = "Dashboard";
             // 
@@ -376,6 +376,7 @@ namespace QuanLyTiemDaQuy.Forms
             this.pnlStats.Name = "pnlStats";
             this.pnlStats.Size = new System.Drawing.Size(940, 250);
             this.pnlStats.TabIndex = 0;
+            this.pnlStats.Paint += new System.Windows.Forms.PaintEventHandler(this.pnlStats_Paint);
             // 
             // pnlStat1
             // 
@@ -431,6 +432,7 @@ namespace QuanLyTiemDaQuy.Forms
             this.lblLowStock.TabIndex = 1;
             this.lblLowStock.Text = "0";
             this.lblLowStock.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblLowStock.Click += new System.EventHandler(this.lblLowStock_Click);
             // 
             // label3
             // 
@@ -442,6 +444,7 @@ namespace QuanLyTiemDaQuy.Forms
             this.label3.TabIndex = 0;
             this.label3.Text = "⚠️ Tồn kho thấp";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.label3.Click += new System.EventHandler(this.label3_Click);
             // 
             // pnlStat3
             // 
@@ -604,6 +607,7 @@ namespace QuanLyTiemDaQuy.Forms
             this.pnlStat5.ResumeLayout(false);
             this.pnlStat6.ResumeLayout(false);
             this.ResumeLayout(false);
+
         }
 
         #endregion

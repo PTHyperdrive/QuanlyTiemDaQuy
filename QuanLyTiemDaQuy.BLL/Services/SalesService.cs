@@ -21,7 +21,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
             _customerRepository = new CustomerRepository();
         }
 
-        #region Thao tác hoá đơn
+        #region Invoice Operations
 
         public List<Invoice> GetAllInvoices()
         {
@@ -58,7 +58,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
 
         #endregion
 
-        #region Quản lý trạng thái hoá đơn
+        #region Invoice Status Management
 
         /// <summary>
         /// Hoàn thành hoá đơn (xuất hoá đơn)
@@ -78,7 +78,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
             bool success = _invoiceRepository.CompleteInvoice(invoiceId);
             if (success)
             {
-                // Cập nhật tổng mua của khách hàng
+                // Update customer total purchase
                 if (invoice.CustomerId > 0)
                 {
                     _customerRepository.UpdateTotalPurchase(invoice.CustomerId, invoice.Total);
@@ -89,7 +89,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
         }
 
         /// <summary>
-        /// Huỷ hoá đơn với lý do (trigger sẽ hoàn trả tồn kho)
+        /// Huỷ hoá đơn với lý do (chỉ huỷ được hoá đơn đang chờ thanh toán)
         /// </summary>
         public (bool Success, string Message) CancelInvoice(int invoiceId, string reason)
         {
@@ -100,6 +100,9 @@ namespace QuanLyTiemDaQuy.BLL.Services
             if (invoice.IsCancelled)
                 return (false, "Hoá đơn đã được huỷ trước đó");
 
+            if (invoice.IsCompleted)
+                return (false, "Không thể huỷ hoá đơn đã xuất! Chỉ huỷ được hoá đơn đang chờ thanh toán.");
+
             if (string.IsNullOrWhiteSpace(reason))
                 return (false, "Vui lòng nhập lý do huỷ hoá đơn");
 
@@ -109,9 +112,31 @@ namespace QuanLyTiemDaQuy.BLL.Services
             return (false, "Không thể huỷ hoá đơn");
         }
 
+        /// <summary>
+        /// Lấy hoá đơn đang chờ thanh toán của chi nhánh (mỗi chi nhánh chỉ 1 hoá đơn pending)
+        /// </summary>
+        public Invoice GetPendingInvoiceByBranch(int branchId)
+        {
+            var pendingInvoices = _invoiceRepository.GetByStatus(InvoiceStatus.Pending);
+            foreach (var inv in pendingInvoices)
+            {
+                if (inv.BranchId == branchId)
+                    return inv;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Kiểm tra chi nhánh có hoá đơn pending không
+        /// </summary>
+        public bool HasPendingInvoice(int branchId)
+        {
+            return GetPendingInvoiceByBranch(branchId) != null;
+        }
+
         #endregion
 
-        #region Tạo hoá đơn (Bán hàng)
+        #region Create Invoice (Sale)
 
         /// <summary>
         /// Tạo hóa đơn bán hàng với đầy đủ kiểm tra tồn kho
@@ -119,14 +144,14 @@ namespace QuanLyTiemDaQuy.BLL.Services
         /// </summary>
         public (bool Success, string Message, int InvoiceId) CreateInvoice(Invoice invoice, bool autoComplete = true)
         {
-            // Kiểm tra dữ liệu hoá đơn
+            // Validate invoice
             if (invoice.Details == null || invoice.Details.Count == 0)
                 return (false, "Hóa đơn phải có ít nhất 1 sản phẩm", 0);
 
             if (invoice.EmployeeId <= 0)
                 return (false, "Không xác định được nhân viên bán hàng", 0);
 
-            // Kiểm tra tồn kho cho tất cả sản phẩm
+            // Check stock availability for all items
             var stockErrors = new List<string>();
             foreach (var detail in invoice.Details)
             {
@@ -142,7 +167,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
                     stockErrors.Add($"{product.Name}: Yêu cầu {detail.Qty}, chỉ còn {product.StockQty}");
                 }
 
-                // Thiết lập thông tin sản phẩm để hiển thị
+                // Set product info for display
                 detail.ProductCode = product.ProductCode;
                 detail.ProductName = product.Name;
                 detail.UnitPrice = product.SellPrice;
@@ -154,10 +179,10 @@ namespace QuanLyTiemDaQuy.BLL.Services
                 return (false, "Không đủ tồn kho:\n" + string.Join("\n", stockErrors), 0);
             }
 
-            // Tính tổng tiền
+            // Calculate totals
             invoice.CalculateTotals();
 
-            // Tạo mã hoá đơn
+            // Generate invoice code
             if (string.IsNullOrEmpty(invoice.InvoiceCode))
             {
                 invoice.InvoiceCode = GenerateInvoiceCode();
@@ -168,10 +193,10 @@ namespace QuanLyTiemDaQuy.BLL.Services
 
             try
             {
-                // Chèn hoá đơn (trigger trong DB sẽ cập nhật tồn kho)
+                // Insert invoice (trigger in DB will update stock)
                 int invoiceId = _invoiceRepository.Insert(invoice);
 
-                // Cập nhật tổng mua của khách hàng nếu đã hoàn thành và có khách hàng
+                // Update customer total purchase if completed and has customer
                 if (autoComplete && invoice.CustomerId > 0)
                 {
                     _customerRepository.UpdateTotalPurchase(invoice.CustomerId, invoice.Total);
@@ -201,7 +226,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
             if (product == null)
                 return (false, $"Không tìm thấy sản phẩm với mã '{productCode}'", null);
 
-            // Kiểm tra số lượng hiện tại trong giỏ hàng
+            // Check current qty in cart
             int currentCartQty = 0;
             foreach (var item in currentCart)
             {
@@ -245,7 +270,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
 
         #endregion
 
-        #region Thống kê
+        #region Statistics
 
         /// <summary>
         /// Lấy doanh thu hôm nay (chỉ tính hoá đơn đã xuất)

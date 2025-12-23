@@ -12,6 +12,7 @@ namespace QuanLyTiemDaQuy.Forms
     {
         private readonly EmployeeService _employeeService;
         private List<Employee> _employees;
+        private List<Branch> _branches;
         private Employee _selectedEmployee;
 
         public UserManagementForm()
@@ -31,9 +32,32 @@ namespace QuanLyTiemDaQuy.Forms
                 return;
             }
 
+            LoadBranches();
             LoadRoles();
             LoadEmployees();
             ClearForm();
+        }
+
+        private void LoadBranches()
+        {
+            try
+            {
+                _branches = _employeeService.GetAllBranches();
+                cboBranch.Items.Clear();
+                foreach (var branch in _branches)
+                {
+                    if (branch.IsActive)
+                        cboBranch.Items.Add(branch);
+                }
+                cboBranch.DisplayMember = "Name";
+                cboBranch.ValueMember = "BranchId";
+                if (cboBranch.Items.Count > 0)
+                    cboBranch.SelectedIndex = 0;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Lỗi tải chi nhánh: {ex.Message}", "Lỗi");
+            }
         }
 
         private bool CanAccessUserManagement()
@@ -103,7 +127,7 @@ namespace QuanLyTiemDaQuy.Forms
             if (dgvEmployees.Columns.Contains("CreatedAt"))
                 dgvEmployees.Columns["CreatedAt"].HeaderText = "Ngày tạo";
 
-            // Đánh dấu các dòng không hoạt động
+            // Highlight inactive rows
             foreach (DataGridViewRow row in dgvEmployees.Rows)
             {
                 var emp = row.DataBoundItem as Employee;
@@ -131,6 +155,10 @@ namespace QuanLyTiemDaQuy.Forms
             btnDeactivate.Enabled = false;
             btnResetPassword.Enabled = false;
             
+            // Enable password field for new employee
+            txtPassword.Enabled = true;
+            lblPassword.Text = "Mật khẩu: *";
+            
             txtName.Focus();
             grpDetails.Text = "Thông tin nhân viên - Thêm mới";
         }
@@ -149,11 +177,38 @@ namespace QuanLyTiemDaQuy.Forms
             txtEmail.Text = _selectedEmployee.Email;
             cboRole.SelectedItem = _selectedEmployee.Role;
             chkActive.Checked = _selectedEmployee.IsActive;
+            
+            // Select branch
+            for (int i = 0; i < cboBranch.Items.Count; i++)
+            {
+                var branch = cboBranch.Items[i] as Branch;
+                if (branch != null && branch.BranchId == _selectedEmployee.BranchId)
+                {
+                    cboBranch.SelectedIndex = i;
+                    break;
+                }
+            }
 
             btnAdd.Enabled = CanAddEmployee();
             btnUpdate.Enabled = CanAddEmployee();
-            btnDeactivate.Enabled = CanAddEmployee() && _selectedEmployee.IsActive;
+            btnDeactivate.Enabled = CanAddEmployee();
             btnResetPassword.Enabled = EmployeeService.CurrentEmployee?.IsAdmin ?? false;
+            
+            // Disable password field when editing - use Reset Password instead
+            txtPassword.Enabled = false;
+            lblPassword.Text = "Mật khẩu:";
+            
+            // Toggle button text based on employee status
+            if (_selectedEmployee.IsActive)
+            {
+                btnDeactivate.Text = "🚫 Vô hiệu hóa";
+                btnDeactivate.BackColor = System.Drawing.Color.FromArgb(220, 53, 69);
+            }
+            else
+            {
+                btnDeactivate.Text = "✅ Kích hoạt";
+                btnDeactivate.BackColor = System.Drawing.Color.FromArgb(40, 167, 69);
+            }
             
             grpDetails.Text = $"Thông tin nhân viên - {_selectedEmployee.Name}";
         }
@@ -178,6 +233,7 @@ namespace QuanLyTiemDaQuy.Forms
                 return;
             }
 
+            var selectedBranch = cboBranch.SelectedItem as Branch;
             var employee = new Employee
             {
                 Name = InputValidator.Sanitize(txtName.Text.Trim()),
@@ -185,7 +241,8 @@ namespace QuanLyTiemDaQuy.Forms
                 Phone = InputValidator.Sanitize(txtPhone.Text.Trim()),
                 Email = InputValidator.Sanitize(txtEmail.Text.Trim()),
                 Role = cboRole.SelectedItem?.ToString() ?? EmployeeRoles.Sales,
-                IsActive = chkActive.Checked
+                IsActive = chkActive.Checked,
+                BranchId = selectedBranch?.BranchId ?? 1
             };
 
             var result = _employeeService.AddEmployee(employee, txtPassword.Text);
@@ -233,6 +290,11 @@ namespace QuanLyTiemDaQuy.Forms
             _selectedEmployee.Email = InputValidator.Sanitize(txtEmail.Text.Trim());
             _selectedEmployee.Role = cboRole.SelectedItem?.ToString() ?? EmployeeRoles.Sales;
             _selectedEmployee.IsActive = chkActive.Checked;
+            
+            // Admin có thể đổi chi nhánh nhân viên
+            var selectedBranch = cboBranch.SelectedItem as Branch;
+            if (selectedBranch != null)
+                _selectedEmployee.BranchId = selectedBranch.BranchId;
 
             var result = _employeeService.UpdateEmployee(_selectedEmployee);
             
@@ -249,25 +311,50 @@ namespace QuanLyTiemDaQuy.Forms
         {
             if (_selectedEmployee == null)
             {
-                MessageBox.Show("Vui lòng chọn nhân viên cần vô hiệu hóa!", "Thông báo");
+                MessageBox.Show("Vui lòng chọn nhân viên!", "Thông báo");
                 return;
             }
 
-            var confirm = MessageBox.Show(
-                $"Bạn có chắc muốn vô hiệu hóa tài khoản '{_selectedEmployee.Username}'?",
-                "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
-            if (confirm == DialogResult.Yes)
+            if (_selectedEmployee.IsActive)
             {
-                var result = _employeeService.DeactivateEmployee(_selectedEmployee.EmployeeId);
-                
-                MessageBox.Show(result.Message, result.Success ? "Thành công" : "Lỗi",
-                    MessageBoxButtons.OK, result.Success ? MessageBoxIcon.Information : MessageBoxIcon.Error);
+                // Vô hiệu hóa
+                var confirm = MessageBox.Show(
+                    $"Bạn có chắc muốn vô hiệu hóa tài khoản '{_selectedEmployee.Username}'?",
+                    "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
-                if (result.Success)
+                if (confirm == DialogResult.Yes)
                 {
-                    LoadEmployees();
-                    ClearForm();
+                    var result = _employeeService.DeactivateEmployee(_selectedEmployee.EmployeeId);
+                    
+                    MessageBox.Show(result.Message, result.Success ? "Thành công" : "Lỗi",
+                        MessageBoxButtons.OK, result.Success ? MessageBoxIcon.Information : MessageBoxIcon.Error);
+
+                    if (result.Success)
+                    {
+                        LoadEmployees();
+                        ClearForm();
+                    }
+                }
+            }
+            else
+            {
+                // Kích hoạt lại
+                var confirm = MessageBox.Show(
+                    $"Bạn có chắc muốn kích hoạt lại tài khoản '{_selectedEmployee.Username}'?",
+                    "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (confirm == DialogResult.Yes)
+                {
+                    var result = _employeeService.ActivateEmployee(_selectedEmployee.EmployeeId);
+                    
+                    MessageBox.Show(result.Message, result.Success ? "Thành công" : "Lỗi",
+                        MessageBoxButtons.OK, result.Success ? MessageBoxIcon.Information : MessageBoxIcon.Error);
+
+                    if (result.Success)
+                    {
+                        LoadEmployees();
+                        ClearForm();
+                    }
                 }
             }
         }
@@ -286,7 +373,7 @@ namespace QuanLyTiemDaQuy.Forms
                 return;
             }
 
-            string newPassword = "123456"; // Mật khẩu mặc định
+            string newPassword = "123456"; // Default password
             
             var confirm = MessageBox.Show(
                 $"Reset mật khẩu cho '{_selectedEmployee.Username}' về '{newPassword}'?",

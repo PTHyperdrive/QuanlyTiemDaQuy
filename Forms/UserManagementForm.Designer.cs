@@ -132,6 +132,8 @@ namespace QuanLyTiemDaQuy.Forms
             this.grpDetails.Controls.Add(this.lblPassword);
             this.grpDetails.Controls.Add(this.txtUsername);
             this.grpDetails.Controls.Add(this.lblUsername);
+            this.grpDetails.Controls.Add(this.cboBranch);
+            this.grpDetails.Controls.Add(this.lblBranch);
             this.grpDetails.Controls.Add(this.txtName);
             this.grpDetails.Controls.Add(this.lblName);
             this.grpDetails.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -240,6 +242,30 @@ namespace QuanLyTiemDaQuy.Forms
             this.chkActive.TabIndex = 12;
             this.chkActive.Text = "Hoạt động";
             this.chkActive.UseVisualStyleBackColor = true;
+            // 
+            // lblBranch
+            // 
+            this.lblBranch = new System.Windows.Forms.Label();
+            this.lblBranch.AutoSize = true;
+            this.lblBranch.ForeColor = System.Drawing.Color.LightGray;
+            this.lblBranch.Location = new System.Drawing.Point(15, 40);
+            this.lblBranch.Name = "lblBranch";
+            this.lblBranch.Size = new System.Drawing.Size(72, 19);
+            this.lblBranch.TabIndex = 19;
+            this.lblBranch.Text = "Chi nhánh:";
+            // 
+            // cboBranch
+            // 
+            this.cboBranch = new System.Windows.Forms.ComboBox();
+            this.cboBranch.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(65)))), ((int)(((byte)(65)))), ((int)(((byte)(88)))));
+            this.cboBranch.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboBranch.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cboBranch.ForeColor = System.Drawing.Color.White;
+            this.cboBranch.FormattingEnabled = true;
+            this.cboBranch.Location = new System.Drawing.Point(120, 37);
+            this.cboBranch.Name = "cboBranch";
+            this.cboBranch.Size = new System.Drawing.Size(200, 25);
+            this.cboBranch.TabIndex = 20;
             // 
             // cboRole
             // 
@@ -444,5 +470,7 @@ namespace QuanLyTiemDaQuy.Forms
         private System.Windows.Forms.Button btnClose;
         private System.Windows.Forms.Panel pnlStatus;
         private System.Windows.Forms.Label lblStatus;
+        private System.Windows.Forms.Label lblBranch;
+        private System.Windows.Forms.ComboBox cboBranch;
     }
 }

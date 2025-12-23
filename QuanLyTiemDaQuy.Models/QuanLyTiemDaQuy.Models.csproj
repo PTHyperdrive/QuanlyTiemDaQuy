@@ -35,9 +35,11 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Branch.cs" />
     <Compile Include="Certificate.cs" />
     <Compile Include="Customer.cs" />
     <Compile Include="Employee.cs" />
+    <Compile Include="GemstoneMarketPrice.cs" />
     <Compile Include="ImportReceipt.cs" />
     <Compile Include="Invoice.cs" />
     <Compile Include="Product.cs" />

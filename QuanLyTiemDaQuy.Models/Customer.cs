@@ -16,7 +16,7 @@ namespace QuanLyTiemDaQuy.Models
         public decimal TotalPurchase { get; set; }
         public DateTime CreatedAt { get; set; }
 
-        // Thuộc tính hiển thị
+        // Display property
         public string DisplayText { get { return Name + " - " + Phone + " (" + Tier + ")"; } }
     }
 }

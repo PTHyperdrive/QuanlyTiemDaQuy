@@ -40,9 +40,11 @@
     <Compile Include="Services\CustomerService.cs" />
     <Compile Include="Services\EmployeeService.cs" />
     <Compile Include="Services\ImportService.cs" />
+    <Compile Include="Services\PricingService.cs" />
     <Compile Include="Services\ProductService.cs" />
     <Compile Include="Services\ReportService.cs" />
     <Compile Include="Services\SalesService.cs" />
+    <Compile Include="Services\SupplierService.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\QuanLyTiemDaQuy.DAL\QuanLyTiemDaQuy.DAL.csproj">

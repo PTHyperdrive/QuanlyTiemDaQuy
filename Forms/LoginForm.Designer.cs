@@ -21,7 +21,8 @@ namespace QuanLyTiemDaQuy.Forms
             this.pnlLogin = new System.Windows.Forms.Panel();
             this.btnExit = new System.Windows.Forms.Button();
             this.btnLogin = new System.Windows.Forms.Button();
-            this.chkRememberMe = new System.Windows.Forms.CheckBox();
+            this.cboBranch = new System.Windows.Forms.ComboBox();
+            this.lblBranch = new System.Windows.Forms.Label();
             this.txtPassword = new System.Windows.Forms.TextBox();
             this.txtUsername = new System.Windows.Forms.TextBox();
             this.lblPassword = new System.Windows.Forms.Label();
@@ -41,7 +42,7 @@ namespace QuanLyTiemDaQuy.Forms
             this.pnlMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlMain.Location = new System.Drawing.Point(0, 0);
             this.pnlMain.Name = "pnlMain";
-            this.pnlMain.Size = new System.Drawing.Size(500, 400);
+            this.pnlMain.Size = new System.Drawing.Size(500, 420);
             this.pnlMain.TabIndex = 0;
             // 
             // pnlLogin
@@ -49,14 +50,15 @@ namespace QuanLyTiemDaQuy.Forms
             this.pnlLogin.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(55)))), ((int)(((byte)(55)))), ((int)(((byte)(78)))));
             this.pnlLogin.Controls.Add(this.btnExit);
             this.pnlLogin.Controls.Add(this.btnLogin);
-            this.pnlLogin.Controls.Add(this.chkRememberMe);
+            this.pnlLogin.Controls.Add(this.cboBranch);
+            this.pnlLogin.Controls.Add(this.lblBranch);
             this.pnlLogin.Controls.Add(this.txtPassword);
             this.pnlLogin.Controls.Add(this.txtUsername);
             this.pnlLogin.Controls.Add(this.lblPassword);
             this.pnlLogin.Controls.Add(this.lblUsername);
             this.pnlLogin.Location = new System.Drawing.Point(50, 120);
             this.pnlLogin.Name = "pnlLogin";
-            this.pnlLogin.Size = new System.Drawing.Size(400, 250);
+            this.pnlLogin.Size = new System.Drawing.Size(400, 280);
             this.pnlLogin.TabIndex = 2;
             // 
             // btnExit
@@ -66,10 +68,10 @@ namespace QuanLyTiemDaQuy.Forms
             this.btnExit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnExit.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.btnExit.ForeColor = System.Drawing.Color.White;
-            this.btnExit.Location = new System.Drawing.Point(210, 190);
+            this.btnExit.Location = new System.Drawing.Point(210, 220);
             this.btnExit.Name = "btnExit";
             this.btnExit.Size = new System.Drawing.Size(150, 40);
-            this.btnExit.TabIndex = 6;
+            this.btnExit.TabIndex = 7;
             this.btnExit.Text = "Thoát";
             this.btnExit.UseVisualStyleBackColor = false;
             this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
@@ -81,24 +83,36 @@ namespace QuanLyTiemDaQuy.Forms
             this.btnLogin.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnLogin.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.btnLogin.ForeColor = System.Drawing.Color.White;
-            this.btnLogin.Location = new System.Drawing.Point(40, 190);
+            this.btnLogin.Location = new System.Drawing.Point(40, 220);
             this.btnLogin.Name = "btnLogin";
             this.btnLogin.Size = new System.Drawing.Size(150, 40);
-            this.btnLogin.TabIndex = 5;
+            this.btnLogin.TabIndex = 6;
             this.btnLogin.Text = "Đăng Nhập";
             this.btnLogin.UseVisualStyleBackColor = false;
             this.btnLogin.Click += new System.EventHandler(this.btnLogin_Click);
             // 
-            // chkRememberMe
+            // cboBranch
             // 
-            this.chkRememberMe.AutoSize = true;
-            this.chkRememberMe.ForeColor = System.Drawing.Color.White;
-            this.chkRememberMe.Location = new System.Drawing.Point(40, 150);
-            this.chkRememberMe.Name = "chkRememberMe";
-            this.chkRememberMe.Size = new System.Drawing.Size(120, 21);
-            this.chkRememberMe.TabIndex = 4;
-            this.chkRememberMe.Text = "Ghi nhớ đăng nhập";
-            this.chkRememberMe.UseVisualStyleBackColor = true;
+            this.cboBranch.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(65)))), ((int)(((byte)(65)))), ((int)(((byte)(88)))));
+            this.cboBranch.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboBranch.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cboBranch.Font = new System.Drawing.Font("Segoe UI", 11F);
+            this.cboBranch.ForeColor = System.Drawing.Color.White;
+            this.cboBranch.Location = new System.Drawing.Point(40, 170);
+            this.cboBranch.Name = "cboBranch";
+            this.cboBranch.Size = new System.Drawing.Size(320, 28);
+            this.cboBranch.TabIndex = 5;
+            // 
+            // lblBranch
+            // 
+            this.lblBranch.AutoSize = true;
+            this.lblBranch.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.lblBranch.ForeColor = System.Drawing.Color.LightGray;
+            this.lblBranch.Location = new System.Drawing.Point(37, 147);
+            this.lblBranch.Name = "lblBranch";
+            this.lblBranch.Size = new System.Drawing.Size(72, 19);
+            this.lblBranch.TabIndex = 4;
+            this.lblBranch.Text = "Chi nhánh:";
             // 
             // txtPassword
             // 
@@ -173,7 +187,7 @@ namespace QuanLyTiemDaQuy.Forms
             this.AcceptButton = this.btnLogin;
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(500, 400);
+            this.ClientSize = new System.Drawing.Size(500, 420);
             this.Controls.Add(this.pnlMain);
             this.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -195,7 +209,8 @@ namespace QuanLyTiemDaQuy.Forms
         private System.Windows.Forms.Panel pnlLogin;
         private System.Windows.Forms.Button btnExit;
         private System.Windows.Forms.Button btnLogin;
-        private System.Windows.Forms.CheckBox chkRememberMe;
+        private System.Windows.Forms.ComboBox cboBranch;
+        private System.Windows.Forms.Label lblBranch;
         private System.Windows.Forms.TextBox txtPassword;
         private System.Windows.Forms.TextBox txtUsername;
         private System.Windows.Forms.Label lblPassword;
