@@ -96,5 +96,7 @@ public static class PaymentMethods
     public const string Card = "Thẻ";
     public const string Transfer = "Chuyển khoản";
 
-    public static readonly string[] AllMethods = [Cash, Card, Transfer];
+    public const string EWallet = "Ví điện tử";
+
+    public static readonly string[] AllMethods = [Cash, Card, Transfer, EWallet];
 }

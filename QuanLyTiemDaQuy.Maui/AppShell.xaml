@@ -38,6 +38,7 @@
         
         <ShellContent 
             Title="Bán hàng"
+            Route="SalesPage"
             ContentTemplate="{DataTemplate views:SalesPage}"/>
         
         <ShellContent 

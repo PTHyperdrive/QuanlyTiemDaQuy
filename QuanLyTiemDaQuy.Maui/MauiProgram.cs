@@ -36,7 +36,9 @@ public static class MauiProgram
         builder.Services.AddSingleton<IBranchService, BranchService>();
         builder.Services.AddSingleton<ISupplierService, SupplierService>();
         builder.Services.AddSingleton<IPricingService, PricingService>();
+        builder.Services.AddSingleton<IPricingService, PricingService>();
         builder.Services.AddSingleton<IMarketPriceApiService, MarketPriceApiService>();
+        builder.Services.AddSingleton<IDiscountService, DiscountService>();
 
         // Register ViewModels
         builder.Services.AddTransient<LoginViewModel>();
@@ -57,6 +59,13 @@ public static class MauiProgram
 #if DEBUG
         builder.Logging.AddDebug();
 #endif
+
+        // Ensure database table exists to prevent crash on first run
+        try
+        {
+            new DiscountRepository().EnsureTableExists();
+        }
+        catch { /* Ignore */ }
 
         return builder.Build();
     }

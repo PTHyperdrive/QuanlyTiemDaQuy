@@ -164,6 +164,47 @@ namespace QuanLyTiemDaQuy.BLL.Services
             return _branchRepository.GetEmployeesByBranch(branchId);
         }
 
+        /// <summary>
+        /// Xóa chi nhánh (soft delete - vô hiệu hóa)
+        /// Không cho phép xóa chi nhánh chính (CN01)
+        /// </summary>
+        public (bool Success, string Message) DeleteBranch(int branchId)
+        {
+            var branch = _branchRepository.GetById(branchId);
+            if (branch == null)
+                return (false, "Không tìm thấy chi nhánh");
+
+            // Không cho phép xóa chi nhánh chính
+            if (BranchRepository.IsMainBranch(branch.BranchCode))
+                return (false, "Không thể xóa chi nhánh chính (CN01)");
+
+            // Kiểm tra còn nhân viên không
+            var employees = _branchRepository.GetEmployeesByBranch(branchId);
+            int activeCount = 0;
+            foreach (var emp in employees)
+            {
+                if (emp.IsActive) activeCount++;
+            }
+
+            if (activeCount > 0)
+            {
+                return (false, $"Không thể xóa chi nhánh đang có {activeCount} nhân viên hoạt động. Vui lòng chuyển nhân viên sang chi nhánh khác trước.");
+            }
+
+            try
+            {
+                bool success = _branchRepository.Deactivate(branchId);
+                if (success)
+                    return (true, $"Đã xóa chi nhánh {branch.Name}");
+                else
+                    return (false, "Không thể xóa chi nhánh");
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Lỗi: {ex.Message}");
+            }
+        }
+
         #endregion
     }
 }

@@ -23,6 +23,21 @@ public class InvoiceRepository : IInvoiceRepository
         return MapDataTableToList(dt);
     }
 
+    public List<Invoice> GetPendingInvoices()
+    {
+        string query = @"
+            SELECT i.*, c.Name AS CustomerName, e.Name AS EmployeeName, b.BranchCode, b.Name AS BranchName
+            FROM Invoices i
+            LEFT JOIN Customers c ON i.CustomerId = c.CustomerId
+            LEFT JOIN Employees e ON i.EmployeeId = e.EmployeeId
+            LEFT JOIN Branches b ON i.BranchId = b.BranchId
+            WHERE i.Status = @Status
+            ORDER BY i.InvoiceDate DESC";
+        var dt = DatabaseHelper.ExecuteQuery(query, 
+            DatabaseHelper.CreateParameter("@Status", InvoiceStatus.Pending));
+        return MapDataTableToList(dt);
+    }
+
     public Invoice? GetById(int invoiceId)
     {
         string query = @"
@@ -113,7 +128,7 @@ public class InvoiceRepository : IInvoiceRepository
             using var cmd = new SqlCommand(query, conn, trans);
             cmd.Parameters.AddRange([
                 DatabaseHelper.CreateParameter("@InvoiceCode", invoice.InvoiceCode),
-                DatabaseHelper.CreateParameter("@CustomerId", invoice.CustomerId),
+                DatabaseHelper.CreateParameter("@CustomerId", invoice.CustomerId > 0 ? invoice.CustomerId : DBNull.Value),
                 DatabaseHelper.CreateParameter("@EmployeeId", invoice.EmployeeId),
                 DatabaseHelper.CreateParameter("@BranchId", invoice.BranchId > 0 ? invoice.BranchId : DBNull.Value),
                 DatabaseHelper.CreateParameter("@InvoiceDate", invoice.InvoiceDate),
@@ -240,7 +255,7 @@ public class InvoiceRepository : IInvoiceRepository
             {
                 InvoiceId = Convert.ToInt32(row["InvoiceId"]),
                 InvoiceCode = row["InvoiceCode"].ToString() ?? "",
-                CustomerId = Convert.ToInt32(row["CustomerId"]),
+                CustomerId = DatabaseHelper.GetValue<int>(row, "CustomerId") ?? 0,
                 CustomerName = DatabaseHelper.GetString(row, "CustomerName"),
                 EmployeeId = Convert.ToInt32(row["EmployeeId"]),
                 EmployeeName = DatabaseHelper.GetString(row, "EmployeeName"),

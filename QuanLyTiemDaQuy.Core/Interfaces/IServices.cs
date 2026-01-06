@@ -61,6 +61,8 @@ public interface IEmployeeService
 public interface ISalesService
 {
     List<Invoice> GetAllInvoices();
+    List<Invoice> GetPendingInvoices();
+    List<Invoice> GetTodayInvoices();
     Invoice? GetInvoiceById(int invoiceId);
     List<Invoice> GetInvoicesByDateRange(DateTime fromDate, DateTime toDate);
     List<Invoice> GetInvoicesByCustomer(int customerId);
@@ -136,4 +138,16 @@ public interface IMarketPriceApiService
 {
     Task<MarketPriceApiResult> FetchMarketPricesAsync();
     Task<decimal> GetExchangeRateUsdVndAsync();
+}
+
+/// <summary>
+/// Interface cho Discount Service
+/// </summary>
+public interface IDiscountService
+{
+    List<DiscountRule> GetAllRules();
+    (bool Success, string Message) AddRule(DiscountRule rule);
+    (bool Success, string Message) UpdateRule(DiscountRule rule);
+    (bool Success, string Message) DeleteRule(int id);
+    (decimal DiscountPercent, string Reason) CalculateBestDiscount(Customer customer, DateTime date);
 }

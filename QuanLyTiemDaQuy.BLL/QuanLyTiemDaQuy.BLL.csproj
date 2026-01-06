@@ -47,6 +47,7 @@
     <Compile Include="Services\ReportService.cs" />
     <Compile Include="Services\SalesService.cs" />
     <Compile Include="Services\SupplierService.cs" />
+    <Compile Include="Services\DiscountService.cs" />
     <Compile Include="Services\MarketPriceApiService.cs" />
   </ItemGroup>
   <ItemGroup>

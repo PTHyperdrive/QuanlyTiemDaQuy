@@ -1,88 +1,69 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:QuanLyTiemDaQuy.Core.Models;assembly=QuanLyTiemDaQuy.Core"
              x:Class="QuanLyTiemDaQuy.Maui.Views.CustomersPage"
              Title="Khách hàng">
 
     <Grid RowDefinitions="Auto,*">
-        <!-- Search Bar -->
-        <Frame Grid.Row="0" Margin="16,16,16,0" Padding="8" CornerRadius="8">
-            <Grid ColumnDefinitions="*,Auto">
-                <Entry Placeholder="Tìm kiếm khách hàng..."
+        <!-- Header -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Padding="16" BackgroundColor="{StaticResource Primary}">
+            <SearchBar Placeholder="Tìm khách hàng..."
                        Text="{Binding SearchText}"
-                       ReturnCommand="{Binding SearchCommand}"/>
-                <Button Grid.Column="1" 
-                        Text="🔍" 
-                        Command="{Binding SearchCommand}"
-                        BackgroundColor="Transparent"
-                        TextColor="{StaticResource Primary}"/>
-            </Grid>
-        </Frame>
+                       SearchCommand="{Binding SearchCommand}"
+                       BackgroundColor="White"
+                       PlaceholderColor="{StaticResource Gray400}"/>
+            <Button Grid.Column="1"
+                    Text="➕ Thêm KH"
+                    Command="{Binding AddCustomerCommand}"
+                    BackgroundColor="White"
+                    TextColor="{StaticResource Primary}"
+                    Margin="8,0,0,0"/>
+        </Grid>
 
-        <!-- Customers List -->
+        <!-- Customer List -->
         <RefreshView Grid.Row="1" 
                      IsRefreshing="{Binding IsRefreshing}"
                      Command="{Binding RefreshCommand}">
             <CollectionView ItemsSource="{Binding Customers}"
                             SelectionMode="Single"
-                            SelectedItem="{Binding SelectedCustomer}">
+                            SelectedItem="{Binding SelectedCustomer}"
+                            SelectionChangedCommand="{Binding SelectCustomerCommand}"
+                            SelectionChangedCommandParameter="{Binding SelectedCustomer}">
                 <CollectionView.ItemTemplate>
-                    <DataTemplate>
-                        <Frame Margin="16,8" Padding="12" Style="{StaticResource Card}">
-                            <Grid ColumnDefinitions="50,*,Auto" ColumnSpacing="12">
-                                <!-- Avatar -->
-                                <Frame Grid.Column="0" 
-                                       BackgroundColor="{StaticResource Primary}"
-                                       CornerRadius="25"
-                                       WidthRequest="50"
-                                       HeightRequest="50"
-                                       Padding="0">
-                                    <Label Text="👤" 
-                                           FontSize="24" 
-                                           HorizontalOptions="Center"
-                                           VerticalOptions="Center"/>
-                                </Frame>
-
-                                <!-- Customer Info -->
-                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
-                                    <Label Text="{Binding Name}" FontAttributes="Bold"/>
-                                    <Label Text="{Binding Phone}" Style="{StaticResource Caption}"/>
-                                    <Label Text="{Binding Email}" 
-                                           Style="{StaticResource Caption}"
-                                           LineBreakMode="TailTruncation"/>
+                    <DataTemplate x:DataType="models:Customer">
+                        <Frame Margin="8,4" Padding="12" Style="{StaticResource Card}">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <VerticalStackLayout>
+                                    <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="16"/>
+                                    <Label Text="{Binding Phone}" TextColor="{StaticResource Gray600}"/>
                                 </VerticalStackLayout>
-
-                                <!-- Tier Badge -->
-                                <Frame Grid.Column="2" 
-                                       VerticalOptions="Center"
-                                       Padding="8,4"
-                                       CornerRadius="12"
-                                       BackgroundColor="{StaticResource Primary}">
-                                    <Label Text="{Binding Tier}" 
-                                           TextColor="White"
-                                           FontSize="12"/>
-                                </Frame>
+                                <VerticalStackLayout Grid.Column="1" HorizontalOptions="End">
+                                    <Label Text="{Binding Tier, TargetNullValue='Thường'}" 
+                                           TextColor="{Binding Tier, Converter={StaticResource TierToColorConverter}}"
+                                           FontAttributes="Bold"/>
+                                    <Label Text="{Binding TotalPurchase, StringFormat='{0:N0} ₫'}" 
+                                           Style="{StaticResource Caption}"
+                                           HorizontalTextAlignment="End"/>
+                                </VerticalStackLayout>
                             </Grid>
                         </Frame>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
-
                 <CollectionView.EmptyView>
-                    <VerticalStackLayout VerticalOptions="Center" 
-                                         HorizontalOptions="Center"
-                                         Padding="32">
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
                         <Label Text="👥" FontSize="48" HorizontalTextAlignment="Center"/>
-                        <Label Text="Không có khách hàng" HorizontalTextAlignment="Center"/>
+                        <Label Text="Chưa có khách hàng" HorizontalTextAlignment="Center"/>
                     </VerticalStackLayout>
                 </CollectionView.EmptyView>
             </CollectionView>
         </RefreshView>
-
-        <ActivityIndicator Grid.Row="1"
+        
+        <ActivityIndicator Grid.RowSpan="2" 
                            IsRunning="{Binding IsLoading}"
                            IsVisible="{Binding IsLoading}"
                            HorizontalOptions="Center"
-                           VerticalOptions="Center"/>
+                           VerticalOptions="Center"
+                           Color="{StaticResource Primary}"/>
     </Grid>
-
 </ContentPage>

@@ -61,6 +61,7 @@ public interface IInvoiceRepository
     int Add(Invoice invoice);
     bool UpdateStatus(int invoiceId, string status);
     bool Cancel(int invoiceId, string reason);
+    List<Invoice> GetPendingInvoices();
     string GenerateNextCode();
 }
 

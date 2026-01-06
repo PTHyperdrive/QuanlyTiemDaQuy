@@ -191,6 +191,11 @@ public class SalesService : ISalesService
 
     public List<Invoice> GetAllInvoices() => _invoiceRepository.GetAll();
 
+    public List<Invoice> GetPendingInvoices() => _invoiceRepository.GetPendingInvoices();
+
+    public List<Invoice> GetTodayInvoices()
+        => _invoiceRepository.GetByDateRange(DateTime.Today, DateTime.Today);
+
     public Invoice? GetInvoiceById(int invoiceId) => _invoiceRepository.GetById(invoiceId);
 
     public List<Invoice> GetInvoicesByDateRange(DateTime fromDate, DateTime toDate)

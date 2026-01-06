@@ -4,66 +4,288 @@
              x:Class="QuanLyTiemDaQuy.Maui.Views.SalesPage"
              Title="Bán hàng">
 
-    <RefreshView IsRefreshing="{Binding IsRefreshing}"
-                 Command="{Binding RefreshCommand}">
-        <ScrollView>
-            <VerticalStackLayout Padding="16" Spacing="16">
+    <Grid RowDefinitions="Auto,*,Auto" ColumnDefinitions="2*,*">
+        
+        <!-- Header with Search -->
+        <Grid Grid.Row="0" Grid.ColumnSpan="2" 
+              Padding="16" BackgroundColor="{StaticResource Primary}">
+            <Grid ColumnDefinitions="*,Auto">
+                <SearchBar Grid.Column="0"
+                           Placeholder="Tìm sản phẩm theo mã hoặc tên..."
+                           Text="{Binding SearchText}"
+                           SearchCommand="{Binding SearchProductCommand}"
+                           BackgroundColor="White"
+                           PlaceholderColor="{StaticResource Gray400}"/>
+                <Button Grid.Column="1"
+                        Text="🔄"
+                        Command="{Binding RefreshCommand}"
+                        BackgroundColor="White"
+                        TextColor="{StaticResource Primary}"
+                        WidthRequest="50"
+                        Margin="8,0,0,0"/>
+            </Grid>
+        </Grid>
+
+        <!-- Left Panel: Product Grid -->
+        <ScrollView Grid.Row="1" Grid.Column="0" Padding="8">
+            <VerticalStackLayout Spacing="8">
+                <Label Text="Sản phẩm có sẵn" 
+                       Style="{StaticResource Subtitle}"
+                       Margin="8,0"/>
                 
-                <!-- Recent Invoices -->
-                <Label Text="Hóa đơn gần đây" Style="{StaticResource Subtitle}"/>
-                
-                <CollectionView ItemsSource="{Binding Invoices}"
-                                HeightRequest="300">
+                <CollectionView ItemsSource="{Binding AvailableProducts}"
+                                SelectionMode="None">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical" 
+                                         Span="2" 
+                                         HorizontalItemSpacing="8"
+                                         VerticalItemSpacing="8"/>
+                    </CollectionView.ItemsLayout>
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Frame Margin="0,4" Padding="12" Style="{StaticResource Card}">
-                                <Grid ColumnDefinitions="*,Auto">
-                                    <VerticalStackLayout>
-                                        <Label Text="{Binding InvoiceCode}" FontAttributes="Bold"/>
-                                        <Label Text="{Binding CustomerName}" Style="{StaticResource Caption}"/>
-                                        <Label Text="{Binding InvoiceDate, StringFormat='{0:dd/MM/yyyy HH:mm}'}" 
-                                               Style="{StaticResource Caption}"/>
-                                    </VerticalStackLayout>
-                                    <VerticalStackLayout Grid.Column="1" HorizontalOptions="End">
-                                        <Label Text="{Binding Total, StringFormat='{0:N0} ₫'}"
-                                               FontAttributes="Bold"
+                            <Frame Padding="12" Style="{StaticResource Card}">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer 
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.AddToCartCommand}"
+                                        CommandParameter="{Binding .}"/>
+                                </Frame.GestureRecognizers>
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="{Binding ProductCode}" 
+                                           FontSize="11"
+                                           TextColor="{StaticResource Gray500}"/>
+                                    <Label Text="{Binding Name}" 
+                                           FontAttributes="Bold"
+                                           LineBreakMode="TailTruncation"
+                                           MaxLines="2"/>
+                                    <Label Text="{Binding SellPrice, StringFormat='{0:N0} ₫'}"
+                                           TextColor="{StaticResource Primary}"
+                                           FontAttributes="Bold"/>
+                                    <HorizontalStackLayout Spacing="4">
+                                        <Label Text="Tồn kho:" 
+                                               FontSize="11"
+                                               TextColor="{StaticResource Gray500}"/>
+                                        <Label Text="{Binding StockQty}" 
+                                               FontSize="11"
                                                TextColor="{StaticResource Success}"/>
-                                        <Label Text="{Binding Status}" 
-                                               Style="{StaticResource Caption}"
-                                               HorizontalTextAlignment="End"/>
-                                    </VerticalStackLayout>
-                                </Grid>
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
                             </Frame>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
-
+                    
                     <CollectionView.EmptyView>
                         <VerticalStackLayout VerticalOptions="Center" 
                                              HorizontalOptions="Center"
                                              Padding="32">
-                            <Label Text="🧾" FontSize="48" HorizontalTextAlignment="Center"/>
-                            <Label Text="Chưa có hóa đơn" HorizontalTextAlignment="Center"/>
+                            <Label Text="📦" FontSize="48" HorizontalTextAlignment="Center"/>
+                            <Label Text="Không có sản phẩm" HorizontalTextAlignment="Center"/>
                         </VerticalStackLayout>
                     </CollectionView.EmptyView>
                 </CollectionView>
-
-                <!-- Quick Actions -->
-                <Label Text="Thao tác nhanh" Style="{StaticResource Subtitle}"/>
-                
-                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
-                    <Button Grid.Column="0" 
-                            Text="➕ Tạo hóa đơn mới"
-                            Style="{StaticResource PrimaryButton}"/>
-                    <Button Grid.Column="1" 
-                            Text="📋 Xem tất cả"
-                            Style="{StaticResource SecondaryButton}"/>
-                </Grid>
-
-                <ActivityIndicator IsRunning="{Binding IsLoading}"
-                                   IsVisible="{Binding IsLoading}"
-                                   HorizontalOptions="Center"/>
             </VerticalStackLayout>
         </ScrollView>
-    </RefreshView>
+
+        <!-- Right Panel: Cart -->
+        <Frame Grid.Row="1" Grid.Column="1" 
+               Margin="8" Padding="12" 
+               Style="{StaticResource Card}">
+            <Grid RowDefinitions="Auto,*,Auto,Auto,Auto">
+                
+                <!-- Cart Header -->
+                <VerticalStackLayout Grid.Row="0" Spacing="8">
+                    <Label Text="🛒 Giỏ hàng" 
+                           Style="{StaticResource Subtitle}"/>
+                    
+                    <!-- Customer Selection -->
+                    <Frame Padding="8" BorderColor="{StaticResource Gray200}">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Picker ItemsSource="{Binding CustomerList}"
+                                    ItemDisplayBinding="{Binding Name}"
+                                    SelectedItem="{Binding SelectedCustomer}"
+                                    Title="Chọn khách hàng"/>
+                            <Button Grid.Column="1" 
+                                    Text="👤" 
+                                    BackgroundColor="Transparent"
+                                    TextColor="{StaticResource Primary}"/>
+                        </Grid>
+                    </Frame>
+                </VerticalStackLayout>
+                
+                <!-- Cart Items -->
+                <CollectionView Grid.Row="1" 
+                                ItemsSource="{Binding CartItems}"
+                                Margin="0,8">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <SwipeView>
+                                <SwipeView.RightItems>
+                                    <SwipeItems>
+                                        <SwipeItem Text="Xóa" 
+                                                   BackgroundColor="{StaticResource Error}"
+                                                   Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RemoveFromCartCommand}"
+                                                   CommandParameter="{Binding .}"/>
+                                    </SwipeItems>
+                                </SwipeView.RightItems>
+                                <Frame Margin="0,4" Padding="8" BorderColor="{StaticResource Gray200}">
+                                    <Grid ColumnDefinitions="*,Auto,Auto">
+                                        <VerticalStackLayout>
+                                            <Label Text="{Binding ProductName}" 
+                                                   FontAttributes="Bold"
+                                                   LineBreakMode="TailTruncation"/>
+                                            <Label Text="{Binding UnitPrice, StringFormat='{0:N0} ₫'}"
+                                                   FontSize="12"
+                                                   TextColor="{StaticResource Gray500}"/>
+                                        </VerticalStackLayout>
+                                        
+                                        <!-- Quantity Controls -->
+                                        <HorizontalStackLayout Grid.Column="1" Spacing="4">
+                                            <Button Text="-" 
+                                                    WidthRequest="32" HeightRequest="32"
+                                                    Padding="0"
+                                                    BackgroundColor="{StaticResource Gray200}"
+                                                    TextColor="{StaticResource Gray600}"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DecreaseQtyCommand}"
+                                                    CommandParameter="{Binding .}"/>
+                                            <Label Text="{Binding Qty}" 
+                                                   VerticalTextAlignment="Center"
+                                                   WidthRequest="30"
+                                                   HorizontalTextAlignment="Center"/>
+                                            <Button Text="+" 
+                                                    WidthRequest="32" HeightRequest="32"
+                                                    Padding="0"
+                                                    BackgroundColor="{StaticResource Primary}"
+                                                    TextColor="White"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.IncreaseQtyCommand}"
+                                                    CommandParameter="{Binding .}"/>
+                                        </HorizontalStackLayout>
+                                        
+                                        <Label Grid.Column="2"
+                                               Text="{Binding LineTotal, StringFormat='{0:N0}'}"
+                                               VerticalTextAlignment="Center"
+                                               FontAttributes="Bold"
+                                               WidthRequest="80"
+                                               HorizontalTextAlignment="End"/>
+                                    </Grid>
+                                </Frame>
+                            </SwipeView>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                    
+                    <CollectionView.EmptyView>
+                        <VerticalStackLayout VerticalOptions="Center" 
+                                             HorizontalOptions="Center">
+                            <Label Text="Giỏ hàng trống" 
+                                   TextColor="{StaticResource Gray400}"
+                                   HorizontalTextAlignment="Center"/>
+                            <Label Text="Chạm vào sản phẩm để thêm"
+                                   FontSize="12"
+                                   TextColor="{StaticResource Gray400}"
+                                   HorizontalTextAlignment="Center"/>
+                        </VerticalStackLayout>
+                    </CollectionView.EmptyView>
+                </CollectionView>
+                
+                <!-- Totals -->
+                <VerticalStackLayout Grid.Row="2" Spacing="4" Padding="0,8">
+                    <BoxView HeightRequest="1" Color="{StaticResource Gray200}"/>
+                    <Grid ColumnDefinitions="*,*" Padding="0,4">
+                        <Label Text="Tạm tính:" TextColor="{StaticResource Gray600}"/>
+                        <Label Grid.Column="1" 
+                               Text="{Binding Subtotal, StringFormat='{0:N0} ₫'}"
+                               HorizontalTextAlignment="End"/>
+                    </Grid>
+                    <Grid ColumnDefinitions="*,*">
+                        <Label Text="Giảm giá:" TextColor="{StaticResource Gray600}"/>
+                        <Label Grid.Column="1" 
+                               Text="{Binding Discount, StringFormat='-{0:N0} ₫'}"
+                               HorizontalTextAlignment="End"
+                               TextColor="{StaticResource Error}"/>
+                    </Grid>
+                    <Grid ColumnDefinitions="*,*">
+                        <Label Text="VAT (10%):" TextColor="{StaticResource Gray600}"/>
+                        <Label Grid.Column="1" 
+                               Text="{Binding VATAmount, StringFormat='{0:N0} ₫'}"
+                               HorizontalTextAlignment="End"/>
+                    </Grid>
+                    <BoxView HeightRequest="1" Color="{StaticResource Gray300}"/>
+                    <Grid ColumnDefinitions="*,*" Padding="0,4">
+                        <Label Text="Tổng cộng:" 
+                               FontAttributes="Bold" 
+                               FontSize="16"/>
+                        <Label Grid.Column="1" 
+                               Text="{Binding Total, StringFormat='{0:N0} ₫'}"
+                               HorizontalTextAlignment="End"
+                               FontAttributes="Bold"
+                               FontSize="18"
+                               TextColor="{StaticResource Primary}"/>
+                    </Grid>
+                </VerticalStackLayout>
+                
+                <!-- Pending Invoice Actions -->
+                <Grid Grid.Row="3" ColumnDefinitions="*,*,*" ColumnSpacing="4" Margin="0,8,0,0">
+                    <Button Grid.Column="0"
+                            Text="⏳ Lưu chờ"
+                            Command="{Binding SavePendingCommand}"
+                            BackgroundColor="#FFC107"
+                            TextColor="Black"
+                            FontAttributes="Bold"
+                            FontSize="12"/>
+                    <Button Grid.Column="1"
+                            Text="📋 Lấy lại HĐ"
+                            Command="{Binding RetrievePendingCommand}"
+                            BackgroundColor="#17A2B8"
+                            TextColor="White"
+                            FontAttributes="Bold"
+                            FontSize="12"/>
+                    <Button Grid.Column="2"
+                            Text="🚫 Huỷ HĐ chờ"
+                            Command="{Binding CancelPendingCommand}"
+                            BackgroundColor="#DC3545"
+                            TextColor="White"
+                            FontAttributes="Bold"
+                            FontSize="12"/>
+                </Grid>
+
+                <!-- Action Buttons -->
+                <Grid Grid.Row="4" ColumnDefinitions="*,*" ColumnSpacing="8" Margin="0,8,0,0">
+                    <Button Grid.Column="0"
+                            Text="🗑️ Hủy"
+                            Command="{Binding ClearCartCommand}"
+                            Style="{StaticResource SecondaryButton}"/>
+                    <Button Grid.Column="1"
+                            Text="💳 Thanh toán"
+                            Command="{Binding CheckoutCommand}"
+                            Style="{StaticResource PrimaryButton}"/>
+                </Grid>
+            </Grid>
+        </Frame>
+
+        <!-- Bottom: Recent Invoices Toggle (REMOVED) -->
+        <!-- 
+        <Frame Grid.Row="2" Grid.ColumnSpan="2" 
+               Padding="12" Margin="8"
+               Style="{StaticResource Card}">
+            <Grid ColumnDefinitions="*,Auto">
+                <Label Text="{Binding Invoices.Count, StringFormat='📋 {0} hóa đơn hôm nay'}"
+                       VerticalTextAlignment="Center"/>
+                <Button Grid.Column="1"
+                        Text="Xem tất cả"
+                        Command="{Binding ViewAllInvoicesCommand}"
+                        BackgroundColor="Transparent"
+                        TextColor="{StaticResource Primary}"/>
+            </Grid>
+        </Frame> 
+        -->
+        
+        <!-- Loading Overlay -->
+        <Grid Grid.RowSpan="3" Grid.ColumnSpan="2"
+              IsVisible="{Binding IsLoading}"
+              BackgroundColor="#80000000">
+            <ActivityIndicator IsRunning="True" 
+                               Color="White"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"/>
+        </Grid>
+    </Grid>
 
 </ContentPage>

@@ -10,7 +10,7 @@ public partial class SalesPage : ContentPage
     {
         InitializeComponent();
         _viewModel = App.Current?.Handler?.MauiContext?.Services.GetService<SalesViewModel>()
-            ?? new SalesViewModel(null!, null!, null!);
+            ?? new SalesViewModel(null!, null!, null!, null!);
         BindingContext = _viewModel;
     }
 

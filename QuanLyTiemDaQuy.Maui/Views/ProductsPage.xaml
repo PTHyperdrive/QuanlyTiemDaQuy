@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:QuanLyTiemDaQuy.Maui.Converters"
              x:Class="QuanLyTiemDaQuy.Maui.Views.ProductsPage"
              Title="Sản phẩm">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:StoneTypeToIconConverter x:Key="StoneTypeToIconConverter"/>
+            <converters:StockToColorConverter x:Key="StockToColorConverter"/>
+        </ResourceDictionary>
+    </ContentPage.Resources>
 
     <Grid RowDefinitions="Auto,*">
         <!-- Search Bar -->
@@ -32,13 +40,14 @@
                             <Grid ColumnDefinitions="60,*,Auto" ColumnSpacing="12">
                                 <!-- Gemstone Icon -->
                                 <Frame Grid.Column="0" 
-                                       BackgroundColor="{StaticResource Diamond}"
+                                       BackgroundColor="Transparent"
                                        CornerRadius="8"
                                        WidthRequest="60"
                                        HeightRequest="60"
-                                       Padding="0">
-                                    <Label Text="💎" 
-                                           FontSize="28" 
+                                       Padding="0"
+                                       BorderColor="{StaticResource PrimaryLight}">
+                                    <Label Text="{Binding StoneTypeName, Converter={StaticResource StoneTypeToIconConverter}}" 
+                                           FontSize="32" 
                                            HorizontalOptions="Center"
                                            VerticalOptions="Center"/>
                                 </Frame>
@@ -47,7 +56,8 @@
                                 <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
                                     <Label Text="{Binding Name}" 
                                            FontAttributes="Bold"
-                                           LineBreakMode="TailTruncation"/>
+                                           LineBreakMode="TailTruncation"
+                                           TextColor="{Binding StockQty, Converter={StaticResource StockToColorConverter}}"/>
                                     <Label Text="{Binding ProductCode}" 
                                            Style="{StaticResource Caption}"/>
                                     <Label Text="{Binding StoneTypeName}" 

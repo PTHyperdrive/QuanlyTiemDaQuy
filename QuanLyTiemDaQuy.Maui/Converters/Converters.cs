@@ -89,3 +89,29 @@ public class StockToColorConverter : IValueConverter
         throw new NotImplementedException();
     }
 }
+
+/// <summary>
+/// Converts stone type name to emoji icon
+/// </summary>
+public class StoneTypeToIconConverter : IValueConverter
+{
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is string typeName && !string.IsNullOrEmpty(typeName))
+        {
+            string lower = typeName.ToLower();
+            if (lower.Contains("ruby")) return "🔴";
+            if (lower.Contains("emerald") || lower.Contains("lục bảo")) return "🟢";
+            if (lower.Contains("sapphire") || lower.Contains("sa phia")) return "🔵";
+            if (lower.Contains("kim cương") || lower.Contains("diamond")) return "💎";
+            if (lower.Contains("thạch anh") || lower.Contains("quartz")) return "🔮";
+            if (lower.Contains("ngọc trai") || lower.Contains("pearl")) return "⚪";
+        }
+        return "💎"; // Default
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}

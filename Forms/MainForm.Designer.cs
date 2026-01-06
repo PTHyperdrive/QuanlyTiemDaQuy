@@ -23,6 +23,7 @@ namespace QuanLyTiemDaQuy.Forms
             this.btnReport = new System.Windows.Forms.Button();
             this.btnMarketPrice = new System.Windows.Forms.Button();
             this.btnImport = new System.Windows.Forms.Button();
+            this.btnDiscounts = new System.Windows.Forms.Button(); // Added instantiation
             this.btnSales = new System.Windows.Forms.Button();
             this.btnSuppliers = new System.Windows.Forms.Button();
             this.btnCustomers = new System.Windows.Forms.Button();
@@ -78,6 +79,7 @@ namespace QuanLyTiemDaQuy.Forms
             this.pnlSidebar.Controls.Add(this.btnReport);
             this.pnlSidebar.Controls.Add(this.btnMarketPrice);
             this.pnlSidebar.Controls.Add(this.btnImport);
+            this.pnlSidebar.Controls.Add(this.btnDiscounts); // Added
             this.pnlSidebar.Controls.Add(this.btnSales);
             this.pnlSidebar.Controls.Add(this.btnSuppliers);
             this.pnlSidebar.Controls.Add(this.btnCustomers);
@@ -157,6 +159,23 @@ namespace QuanLyTiemDaQuy.Forms
             this.btnMarketPrice.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnMarketPrice.UseVisualStyleBackColor = true;
             this.btnMarketPrice.Click += new System.EventHandler(this.btnMarketPrice_Click);
+            // 
+            // btnDiscounts
+            // 
+            this.btnDiscounts.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnDiscounts.FlatAppearance.BorderSize = 0;
+            this.btnDiscounts.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnDiscounts.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.btnDiscounts.ForeColor = System.Drawing.Color.Gainsboro;
+            this.btnDiscounts.Location = new System.Drawing.Point(0, 375); // Adjusted location flow if needed, but Dock=Top handles order
+            this.btnDiscounts.Name = "btnDiscounts";
+            this.btnDiscounts.Padding = new System.Windows.Forms.Padding(15, 0, 0, 0);
+            this.btnDiscounts.Size = new System.Drawing.Size(220, 45);
+            this.btnDiscounts.TabIndex = 7;
+            this.btnDiscounts.Text = "🏷️  Giảm giá";
+            this.btnDiscounts.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnDiscounts.UseVisualStyleBackColor = true;
+            this.btnDiscounts.Click += new System.EventHandler(this.btnDiscounts_Click);
             // 
             // btnImport
             // 
@@ -624,6 +643,7 @@ namespace QuanLyTiemDaQuy.Forms
         private System.Windows.Forms.Button btnReport;
         private System.Windows.Forms.Button btnMarketPrice;
         private System.Windows.Forms.Button btnUsers;
+        private System.Windows.Forms.Button btnDiscounts; // Added
         private System.Windows.Forms.Button btnLogout;
         private System.Windows.Forms.Panel pnlHeader;
         private System.Windows.Forms.Label lblTitle;
