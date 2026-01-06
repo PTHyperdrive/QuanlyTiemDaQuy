@@ -13,10 +13,11 @@ public class InvoiceRepository : IInvoiceRepository
     public List<Invoice> GetAll()
     {
         string query = @"
-            SELECT i.*, c.Name AS CustomerName, e.Name AS EmployeeName
+            SELECT i.*, c.Name AS CustomerName, e.Name AS EmployeeName, b.BranchCode, b.Name AS BranchName
             FROM Invoices i
             LEFT JOIN Customers c ON i.CustomerId = c.CustomerId
             LEFT JOIN Employees e ON i.EmployeeId = e.EmployeeId
+            LEFT JOIN Branches b ON i.BranchId = b.BranchId
             ORDER BY i.InvoiceDate DESC";
         var dt = DatabaseHelper.ExecuteQuery(query);
         return MapDataTableToList(dt);
@@ -25,10 +26,11 @@ public class InvoiceRepository : IInvoiceRepository
     public Invoice? GetById(int invoiceId)
     {
         string query = @"
-            SELECT i.*, c.Name AS CustomerName, e.Name AS EmployeeName
+            SELECT i.*, c.Name AS CustomerName, e.Name AS EmployeeName, b.BranchCode, b.Name AS BranchName
             FROM Invoices i
             LEFT JOIN Customers c ON i.CustomerId = c.CustomerId
             LEFT JOIN Employees e ON i.EmployeeId = e.EmployeeId
+            LEFT JOIN Branches b ON i.BranchId = b.BranchId
             WHERE i.InvoiceId = @InvoiceId";
         var dt = DatabaseHelper.ExecuteQuery(query,
             DatabaseHelper.CreateParameter("@InvoiceId", invoiceId));
@@ -45,10 +47,11 @@ public class InvoiceRepository : IInvoiceRepository
     public Invoice? GetByCode(string invoiceCode)
     {
         string query = @"
-            SELECT i.*, c.Name AS CustomerName, e.Name AS EmployeeName
+            SELECT i.*, c.Name AS CustomerName, e.Name AS EmployeeName, b.BranchCode, b.Name AS BranchName
             FROM Invoices i
             LEFT JOIN Customers c ON i.CustomerId = c.CustomerId
             LEFT JOIN Employees e ON i.EmployeeId = e.EmployeeId
+            LEFT JOIN Branches b ON i.BranchId = b.BranchId
             WHERE i.InvoiceCode = @InvoiceCode";
         var dt = DatabaseHelper.ExecuteQuery(query,
             DatabaseHelper.CreateParameter("@InvoiceCode", invoiceCode));
@@ -65,10 +68,11 @@ public class InvoiceRepository : IInvoiceRepository
     public List<Invoice> GetByDateRange(DateTime fromDate, DateTime toDate)
     {
         string query = @"
-            SELECT i.*, c.Name AS CustomerName, e.Name AS EmployeeName
+            SELECT i.*, c.Name AS CustomerName, e.Name AS EmployeeName, b.BranchCode, b.Name AS BranchName
             FROM Invoices i
             LEFT JOIN Customers c ON i.CustomerId = c.CustomerId
             LEFT JOIN Employees e ON i.EmployeeId = e.EmployeeId
+            LEFT JOIN Branches b ON i.BranchId = b.BranchId
             WHERE CAST(i.InvoiceDate AS DATE) BETWEEN @FromDate AND @ToDate
             ORDER BY i.InvoiceDate DESC";
         var dt = DatabaseHelper.ExecuteQuery(query,
@@ -80,10 +84,11 @@ public class InvoiceRepository : IInvoiceRepository
     public List<Invoice> GetByCustomerId(int customerId)
     {
         string query = @"
-            SELECT i.*, c.Name AS CustomerName, e.Name AS EmployeeName
+            SELECT i.*, c.Name AS CustomerName, e.Name AS EmployeeName, b.BranchCode, b.Name AS BranchName
             FROM Invoices i
             LEFT JOIN Customers c ON i.CustomerId = c.CustomerId
             LEFT JOIN Employees e ON i.EmployeeId = e.EmployeeId
+            LEFT JOIN Branches b ON i.BranchId = b.BranchId
             WHERE i.CustomerId = @CustomerId
             ORDER BY i.InvoiceDate DESC";
         var dt = DatabaseHelper.ExecuteQuery(query,
@@ -99,9 +104,9 @@ public class InvoiceRepository : IInvoiceRepository
         {
             // Insert invoice header
             string query = @"
-                INSERT INTO Invoices (InvoiceCode, CustomerId, EmployeeId, InvoiceDate, 
+                INSERT INTO Invoices (InvoiceCode, CustomerId, EmployeeId, BranchId, InvoiceDate, 
                     Subtotal, DiscountPercent, DiscountAmount, VAT, VATAmount, Total, PaymentMethod, Status, Note)
-                VALUES (@InvoiceCode, @CustomerId, @EmployeeId, @InvoiceDate,
+                VALUES (@InvoiceCode, @CustomerId, @EmployeeId, @BranchId, @InvoiceDate,
                     @Subtotal, @DiscountPercent, @DiscountAmount, @VAT, @VATAmount, @Total, @PaymentMethod, @Status, @Note);
                 SELECT SCOPE_IDENTITY();";
 
@@ -110,6 +115,7 @@ public class InvoiceRepository : IInvoiceRepository
                 DatabaseHelper.CreateParameter("@InvoiceCode", invoice.InvoiceCode),
                 DatabaseHelper.CreateParameter("@CustomerId", invoice.CustomerId),
                 DatabaseHelper.CreateParameter("@EmployeeId", invoice.EmployeeId),
+                DatabaseHelper.CreateParameter("@BranchId", invoice.BranchId > 0 ? invoice.BranchId : DBNull.Value),
                 DatabaseHelper.CreateParameter("@InvoiceDate", invoice.InvoiceDate),
                 DatabaseHelper.CreateParameter("@Subtotal", invoice.Subtotal),
                 DatabaseHelper.CreateParameter("@DiscountPercent", invoice.DiscountPercent),
@@ -238,6 +244,8 @@ public class InvoiceRepository : IInvoiceRepository
                 CustomerName = DatabaseHelper.GetString(row, "CustomerName"),
                 EmployeeId = Convert.ToInt32(row["EmployeeId"]),
                 EmployeeName = DatabaseHelper.GetString(row, "EmployeeName"),
+                BranchId = DatabaseHelper.GetValue<int>(row, "BranchId") ?? 0,
+                BranchName = DatabaseHelper.GetString(row, "BranchName") ?? "",
                 InvoiceDate = Convert.ToDateTime(row["InvoiceDate"]),
                 Subtotal = Convert.ToDecimal(row["Subtotal"]),
                 DiscountPercent = Convert.ToDecimal(row["DiscountPercent"]),

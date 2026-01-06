@@ -113,13 +113,42 @@ namespace QuanLyTiemDaQuy.DAL.Repositories
 
         /// <summary>
         /// Sinh mã chi nhánh tự động
+        /// CN01 = chi nhánh đầu tiên (chính), CN02+ = chi nhánh phụ
         /// </summary>
         public string GenerateBranchCode()
         {
-            string query = "SELECT ISNULL(MAX(CAST(SUBSTRING(BranchCode, 3, 10) AS INT)), 0) + 1 FROM Branches WHERE BranchCode LIKE 'CN%'";
+            string query = "SELECT COUNT(*) FROM Branches";
             var result = DatabaseHelper.ExecuteScalar(query);
-            int nextId = Convert.ToInt32(result);
-            return $"CN{nextId:D3}"; // CN001, CN002, ...
+            int count = Convert.ToInt32(result);
+            
+            // CN01 cho chi nhánh đầu tiên, CN02, CN03... cho các chi nhánh tiếp theo
+            int nextNumber = count + 1;
+            return $"CN{nextNumber:D2}"; // CN01, CN02, CN03...
+        }
+
+        /// <summary>
+        /// Kiểm tra tên chi nhánh hợp lệ (phải bắt đầu bằng "Chi nhánh")
+        /// </summary>
+        public static (bool IsValid, string Message) ValidateBranchName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return (false, "Tên chi nhánh không được để trống");
+            
+            if (!name.StartsWith("Chi nhánh", StringComparison.OrdinalIgnoreCase))
+                return (false, "Tên chi nhánh phải bắt đầu bằng 'Chi nhánh' (ví dụ: Chi nhánh Nguyễn Tri Phương)");
+            
+            if (name.Length < 12) // "Chi nhánh " + ít nhất 1 ký tự
+                return (false, "Tên chi nhánh quá ngắn");
+            
+            return (true, "");
+        }
+
+        /// <summary>
+        /// Kiểm tra chi nhánh có phải chi nhánh chính không (CN01)
+        /// </summary>
+        public static bool IsMainBranch(string branchCode)
+        {
+            return branchCode == "CN01";
         }
 
         /// <summary>

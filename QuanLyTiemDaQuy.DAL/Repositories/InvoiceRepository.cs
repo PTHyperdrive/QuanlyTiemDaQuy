@@ -14,10 +14,11 @@ namespace QuanLyTiemDaQuy.DAL.Repositories
         public List<Invoice> GetAll()
         {
             string query = @"
-                SELECT i.*, c.Name AS CustomerName, e.Name AS EmployeeName
+                SELECT i.*, c.Name AS CustomerName, e.Name AS EmployeeName, b.BranchCode, b.Name AS BranchName
                 FROM Invoices i
                 LEFT JOIN Customers c ON i.CustomerId = c.CustomerId
                 INNER JOIN Employees e ON i.EmployeeId = e.EmployeeId
+                LEFT JOIN Branches b ON i.BranchId = b.BranchId
                 ORDER BY i.InvoiceDate DESC";
             
             var dt = DatabaseHelper.ExecuteQuery(query);
@@ -27,10 +28,11 @@ namespace QuanLyTiemDaQuy.DAL.Repositories
         public Invoice GetById(int invoiceId)
         {
             string query = @"
-                SELECT i.*, c.Name AS CustomerName, e.Name AS EmployeeName
+                SELECT i.*, c.Name AS CustomerName, e.Name AS EmployeeName, b.BranchCode, b.Name AS BranchName
                 FROM Invoices i
                 LEFT JOIN Customers c ON i.CustomerId = c.CustomerId
                 INNER JOIN Employees e ON i.EmployeeId = e.EmployeeId
+                LEFT JOIN Branches b ON i.BranchId = b.BranchId
                 WHERE i.InvoiceId = @InvoiceId";
             
             var dt = DatabaseHelper.ExecuteQuery(query, 
@@ -47,10 +49,11 @@ namespace QuanLyTiemDaQuy.DAL.Repositories
         public List<Invoice> GetByDateRange(DateTime fromDate, DateTime toDate)
         {
             string query = @"
-                SELECT i.*, c.Name AS CustomerName, e.Name AS EmployeeName
+                SELECT i.*, c.Name AS CustomerName, e.Name AS EmployeeName, b.BranchCode, b.Name AS BranchName
                 FROM Invoices i
                 LEFT JOIN Customers c ON i.CustomerId = c.CustomerId
                 INNER JOIN Employees e ON i.EmployeeId = e.EmployeeId
+                LEFT JOIN Branches b ON i.BranchId = b.BranchId
                 WHERE CAST(i.InvoiceDate AS DATE) BETWEEN @FromDate AND @ToDate
                 ORDER BY i.InvoiceDate DESC";
             
@@ -63,10 +66,11 @@ namespace QuanLyTiemDaQuy.DAL.Repositories
         public List<Invoice> GetByStatus(string status)
         {
             string query = @"
-                SELECT i.*, c.Name AS CustomerName, e.Name AS EmployeeName
+                SELECT i.*, c.Name AS CustomerName, e.Name AS EmployeeName, b.BranchCode, b.Name AS BranchName
                 FROM Invoices i
                 LEFT JOIN Customers c ON i.CustomerId = c.CustomerId
                 INNER JOIN Employees e ON i.EmployeeId = e.EmployeeId
+                LEFT JOIN Branches b ON i.BranchId = b.BranchId
                 WHERE i.Status = @Status
                 ORDER BY i.InvoiceDate DESC";
             
@@ -78,10 +82,11 @@ namespace QuanLyTiemDaQuy.DAL.Repositories
         public List<Invoice> GetByCustomer(int customerId)
         {
             string query = @"
-                SELECT i.*, c.Name AS CustomerName, e.Name AS EmployeeName
+                SELECT i.*, c.Name AS CustomerName, e.Name AS EmployeeName, b.BranchCode, b.Name AS BranchName
                 FROM Invoices i
                 LEFT JOIN Customers c ON i.CustomerId = c.CustomerId
                 INNER JOIN Employees e ON i.EmployeeId = e.EmployeeId
+                LEFT JOIN Branches b ON i.BranchId = b.BranchId
                 WHERE i.CustomerId = @CustomerId
                 ORDER BY i.InvoiceDate DESC";
             
@@ -131,9 +136,9 @@ namespace QuanLyTiemDaQuy.DAL.Repositories
             {
                 // Insert invoice header
                 string insertInvoice = @"
-                    INSERT INTO Invoices (InvoiceCode, CustomerId, EmployeeId, InvoiceDate, 
+                    INSERT INTO Invoices (InvoiceCode, CustomerId, EmployeeId, BranchId, InvoiceDate, 
                         Subtotal, DiscountPercent, DiscountAmount, VAT, VATAmount, Total, PaymentMethod, Status, Note)
-                    VALUES (@InvoiceCode, @CustomerId, @EmployeeId, @InvoiceDate,
+                    VALUES (@InvoiceCode, @CustomerId, @EmployeeId, @BranchId, @InvoiceDate,
                         @Subtotal, @DiscountPercent, @DiscountAmount, @VAT, @VATAmount, @Total, @PaymentMethod, @Status, @Note);
                     SELECT SCOPE_IDENTITY();";
                 
@@ -142,6 +147,7 @@ namespace QuanLyTiemDaQuy.DAL.Repositories
                     cmd.Parameters.AddWithValue("@InvoiceCode", invoice.InvoiceCode);
                     cmd.Parameters.AddWithValue("@CustomerId", invoice.CustomerId > 0 ? (object)invoice.CustomerId : DBNull.Value);
                     cmd.Parameters.AddWithValue("@EmployeeId", invoice.EmployeeId);
+                    cmd.Parameters.AddWithValue("@BranchId", invoice.BranchId > 0 ? (object)invoice.BranchId : DBNull.Value);
                     cmd.Parameters.AddWithValue("@InvoiceDate", invoice.InvoiceDate);
                     cmd.Parameters.AddWithValue("@Subtotal", invoice.Subtotal);
                     cmd.Parameters.AddWithValue("@DiscountPercent", invoice.DiscountPercent);
@@ -258,6 +264,8 @@ namespace QuanLyTiemDaQuy.DAL.Repositories
                     CustomerName = DatabaseHelper.GetString(row, "CustomerName") ?? "Khách lẻ",
                     EmployeeId = Convert.ToInt32(row["EmployeeId"]),
                     EmployeeName = DatabaseHelper.GetString(row, "EmployeeName"),
+                    BranchId = DatabaseHelper.GetValue<int>(row, "BranchId") ?? 0,
+                    BranchName = DatabaseHelper.GetString(row, "BranchName") ?? "",
                     InvoiceDate = Convert.ToDateTime(row["InvoiceDate"]),
                     Subtotal = Convert.ToDecimal(row["Subtotal"]),
                     DiscountPercent = Convert.ToDecimal(row["DiscountPercent"]),
