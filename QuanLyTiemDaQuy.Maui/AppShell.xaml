@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="QuanLyTiemDaQuy.Maui.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:QuanLyTiemDaQuy.Maui.Views"
+    Title="Quản Lý Tiệm Đá Quý"
+    FlyoutBehavior="Disabled"
+    Shell.BackgroundColor="{StaticResource Primary}"
+    Shell.ForegroundColor="White"
+    Shell.TitleColor="White"
+    Shell.TabBarBackgroundColor="White"
+    Shell.TabBarForegroundColor="{StaticResource Primary}"
+    Shell.TabBarUnselectedColor="{StaticResource Gray500}">
+
+    <!-- Shell Header Template for better visibility -->
+    <Shell.Resources>
+        <ResourceDictionary>
+            <Style TargetType="TabBar">
+                <Setter Property="Shell.TabBarBackgroundColor" Value="White"/>
+                <Setter Property="Shell.TabBarForegroundColor" Value="{StaticResource Primary}"/>
+            </Style>
+        </ResourceDictionary>
+    </Shell.Resources>
+
+    <TabBar>
+        <ShellContent 
+            Title="Dashboard"
+            ContentTemplate="{DataTemplate views:DashboardPage}"/>
+        
+        <ShellContent 
+            Title="Sản phẩm"
+            ContentTemplate="{DataTemplate views:ProductsPage}"/>
+        
+        <ShellContent 
+            Title="Khách hàng"
+            ContentTemplate="{DataTemplate views:CustomersPage}"/>
+        
+        <ShellContent 
+            Title="Bán hàng"
+            ContentTemplate="{DataTemplate views:SalesPage}"/>
+        
+        <ShellContent 
+            Title="Báo cáo"
+            ContentTemplate="{DataTemplate views:ReportsPage}"/>
+    </TabBar>
+
+</Shell>

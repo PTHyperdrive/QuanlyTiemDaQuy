@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="QuanLyTiemDaQuy.Maui.Views.ReportsPage"
+             Title="Báo cáo">
+
+    <RefreshView IsRefreshing="{Binding IsRefreshing}"
+                 Command="{Binding RefreshCommand}">
+        <ScrollView>
+            <VerticalStackLayout Padding="16" Spacing="16">
+                
+                <!-- Summary Stats -->
+                <Label Text="Tổng quan" Style="{StaticResource Subtitle}"/>
+                
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12" RowSpacing="12">
+                    <Frame Grid.Column="0" Style="{StaticResource Card}">
+                        <VerticalStackLayout>
+                            <Label Text="Doanh thu hôm nay" Style="{StaticResource Caption}"/>
+                            <Label Text="{Binding Stats.TodayRevenue, StringFormat='{0:N0} ₫'}" 
+                                   Style="{StaticResource Subtitle}"
+                                   TextColor="{StaticResource Success}"/>
+                        </VerticalStackLayout>
+                    </Frame>
+                    <Frame Grid.Column="1" Style="{StaticResource Card}">
+                        <VerticalStackLayout>
+                            <Label Text="Doanh thu tháng" Style="{StaticResource Caption}"/>
+                            <Label Text="{Binding Stats.MonthRevenue, StringFormat='{0:N0} ₫'}" 
+                                   Style="{StaticResource Subtitle}"
+                                   TextColor="{StaticResource Success}"/>
+                        </VerticalStackLayout>
+                    </Frame>
+                </Grid>
+
+                <!-- Top Products -->
+                <Label Text="Sản phẩm bán chạy" Style="{StaticResource Subtitle}"/>
+                
+                <CollectionView ItemsSource="{Binding TopProducts}"
+                                HeightRequest="200">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Frame Margin="0,4" Padding="12" Style="{StaticResource Card}">
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                    <Label Grid.Column="0" Text="💎" FontSize="24" VerticalOptions="Center"/>
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                        <Label Text="{Binding ProductName}" FontAttributes="Bold" LineBreakMode="TailTruncation"/>
+                                        <Label Text="{Binding ProductCode}" Style="{StaticResource Caption}"/>
+                                    </VerticalStackLayout>
+                                    <VerticalStackLayout Grid.Column="2" HorizontalOptions="End">
+                                        <Label Text="{Binding TotalQtySold, StringFormat='Bán: {0}'}" FontAttributes="Bold"/>
+                                        <Label Text="{Binding TotalRevenue, StringFormat='{0:N0} ₫'}" 
+                                               Style="{StaticResource Caption}"
+                                               TextColor="{StaticResource Success}"/>
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+
+                    <CollectionView.EmptyView>
+                        <Label Text="Chưa có dữ liệu" 
+                               HorizontalTextAlignment="Center"
+                               Padding="32"/>
+                    </CollectionView.EmptyView>
+                </CollectionView>
+
+                <!-- Inventory Status -->
+                <Label Text="Tình trạng kho" Style="{StaticResource Subtitle}"/>
+                
+                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                    <Frame Style="{StaticResource Card}">
+                        <VerticalStackLayout HorizontalOptions="Center">
+                            <Label Text="{Binding Stats.TotalProducts}" 
+                                   FontSize="24" 
+                                   FontAttributes="Bold"
+                                   HorizontalTextAlignment="Center"/>
+                            <Label Text="Tổng SP" 
+                                   Style="{StaticResource Caption}"
+                                   HorizontalTextAlignment="Center"/>
+                        </VerticalStackLayout>
+                    </Frame>
+                    <Frame Style="{StaticResource Card}">
+                        <VerticalStackLayout HorizontalOptions="Center">
+                            <Label Text="{Binding Stats.LowStockProducts}" 
+                                   FontSize="24" 
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource Warning}"
+                                   HorizontalTextAlignment="Center"/>
+                            <Label Text="Sắp hết" 
+                                   Style="{StaticResource Caption}"
+                                   HorizontalTextAlignment="Center"/>
+                        </VerticalStackLayout>
+                    </Frame>
+                    <Frame Style="{StaticResource Card}">
+                        <VerticalStackLayout HorizontalOptions="Center">
+                            <Label Text="{Binding Stats.TotalCustomers}" 
+                                   FontSize="24" 
+                                   FontAttributes="Bold"
+                                   HorizontalTextAlignment="Center"/>
+                            <Label Text="Khách hàng" 
+                                   Style="{StaticResource Caption}"
+                                   HorizontalTextAlignment="Center"/>
+                        </VerticalStackLayout>
+                    </Frame>
+                </Grid>
+
+                <ActivityIndicator IsRunning="{Binding IsLoading}"
+                                   IsVisible="{Binding IsLoading}"
+                                   HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+        </ScrollView>
+    </RefreshView>
+
+</ContentPage>

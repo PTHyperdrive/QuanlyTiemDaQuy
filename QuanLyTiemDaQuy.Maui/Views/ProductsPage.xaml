@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="QuanLyTiemDaQuy.Maui.Views.ProductsPage"
+             Title="Sản phẩm">
+
+    <Grid RowDefinitions="Auto,*">
+        <!-- Search Bar -->
+        <Frame Grid.Row="0" Margin="16,16,16,0" Padding="8" CornerRadius="8">
+            <Grid ColumnDefinitions="*,Auto">
+                <Entry Placeholder="Tìm kiếm sản phẩm..."
+                       Text="{Binding SearchText}"
+                       ReturnCommand="{Binding SearchCommand}"/>
+                <Button Grid.Column="1" 
+                        Text="🔍" 
+                        Command="{Binding SearchCommand}"
+                        BackgroundColor="Transparent"
+                        TextColor="{StaticResource Primary}"/>
+            </Grid>
+        </Frame>
+
+        <!-- Products List -->
+        <RefreshView Grid.Row="1" 
+                     IsRefreshing="{Binding IsRefreshing}"
+                     Command="{Binding RefreshCommand}">
+            <CollectionView ItemsSource="{Binding Products}"
+                            SelectionMode="Single"
+                            SelectedItem="{Binding SelectedProduct}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Margin="16,8" Padding="12" Style="{StaticResource Card}">
+                            <Grid ColumnDefinitions="60,*,Auto" ColumnSpacing="12">
+                                <!-- Gemstone Icon -->
+                                <Frame Grid.Column="0" 
+                                       BackgroundColor="{StaticResource Diamond}"
+                                       CornerRadius="8"
+                                       WidthRequest="60"
+                                       HeightRequest="60"
+                                       Padding="0">
+                                    <Label Text="💎" 
+                                           FontSize="28" 
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center"/>
+                                </Frame>
+
+                                <!-- Product Info -->
+                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                    <Label Text="{Binding Name}" 
+                                           FontAttributes="Bold"
+                                           LineBreakMode="TailTruncation"/>
+                                    <Label Text="{Binding ProductCode}" 
+                                           Style="{StaticResource Caption}"/>
+                                    <Label Text="{Binding StoneTypeName}" 
+                                           Style="{StaticResource Caption}"
+                                           TextColor="{StaticResource Primary}"/>
+                                </VerticalStackLayout>
+
+                                <!-- Price & Stock -->
+                                <VerticalStackLayout Grid.Column="2" 
+                                                     VerticalOptions="Center"
+                                                     HorizontalOptions="End">
+                                    <Label Text="{Binding SellPrice, StringFormat='{0:N0} ₫'}"
+                                           FontAttributes="Bold"
+                                           TextColor="{StaticResource Success}"/>
+                                    <Label Text="{Binding StockQty, StringFormat='Kho: {0}'}"
+                                           Style="{StaticResource Caption}"/>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout VerticalOptions="Center" 
+                                         HorizontalOptions="Center"
+                                         Padding="32">
+                        <Label Text="📦" FontSize="48" HorizontalTextAlignment="Center"/>
+                        <Label Text="Không có sản phẩm" 
+                               HorizontalTextAlignment="Center"/>
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+            </CollectionView>
+        </RefreshView>
+
+        <!-- Loading -->
+        <ActivityIndicator Grid.Row="1"
+                           IsRunning="{Binding IsLoading}"
+                           IsVisible="{Binding IsLoading}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+    </Grid>
+
+</ContentPage>

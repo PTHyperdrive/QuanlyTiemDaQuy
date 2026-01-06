@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="QuanLyTiemDaQuy.Maui.Views.DashboardPage"
+             Title="Dashboard">
+
+    <RefreshView IsRefreshing="{Binding IsRefreshing}"
+                 Command="{Binding RefreshCommand}">
+        <ScrollView>
+            <VerticalStackLayout Padding="16" Spacing="16">
+                
+                <!-- Welcome -->
+                <Label Text="{Binding WelcomeMessage}" 
+                       Style="{StaticResource Title}"/>
+                <Label Text="Hệ thống POS - Quản lý tiệm đá quý"
+                       Style="{StaticResource Caption}"/>
+
+                <!-- Stats Grid -->
+                <Grid ColumnDefinitions="*,*" 
+                      RowDefinitions="Auto,Auto,Auto,Auto" 
+                      ColumnSpacing="12" 
+                      RowSpacing="12">
+                    
+                    <!-- Today Revenue -->
+                    <Frame Grid.Row="0" Grid.Column="0" Style="{StaticResource Card}">
+                        <VerticalStackLayout>
+                            <Label Text="Doanh thu hôm nay" Style="{StaticResource Caption}"/>
+                            <Label Text="{Binding Stats.TodayRevenue, StringFormat='{0:N0} ₫'}" 
+                                   Style="{StaticResource Subtitle}"
+                                   TextColor="{StaticResource Success}"/>
+                        </VerticalStackLayout>
+                    </Frame>
+
+                    <!-- Today Invoices -->
+                    <Frame Grid.Row="0" Grid.Column="1" Style="{StaticResource Card}">
+                        <VerticalStackLayout>
+                            <Label Text="Hóa đơn hôm nay" Style="{StaticResource Caption}"/>
+                            <Label Text="{Binding Stats.TodayInvoices}" 
+                                   Style="{StaticResource Subtitle}"
+                                   TextColor="{StaticResource Primary}"/>
+                        </VerticalStackLayout>
+                    </Frame>
+
+                    <!-- Month Revenue -->
+                    <Frame Grid.Row="1" Grid.Column="0" Style="{StaticResource Card}">
+                        <VerticalStackLayout>
+                            <Label Text="Doanh thu tháng" Style="{StaticResource Caption}"/>
+                            <Label Text="{Binding Stats.MonthRevenue, StringFormat='{0:N0} ₫'}" 
+                                   Style="{StaticResource Subtitle}"
+                                   TextColor="{StaticResource Success}"/>
+                        </VerticalStackLayout>
+                    </Frame>
+
+                    <!-- Month Invoices -->
+                    <Frame Grid.Row="1" Grid.Column="1" Style="{StaticResource Card}">
+                        <VerticalStackLayout>
+                            <Label Text="Hóa đơn tháng" Style="{StaticResource Caption}"/>
+                            <Label Text="{Binding Stats.MonthInvoices}" 
+                                   Style="{StaticResource Subtitle}"
+                                   TextColor="{StaticResource Primary}"/>
+                        </VerticalStackLayout>
+                    </Frame>
+
+                    <!-- Total Products -->
+                    <Frame Grid.Row="2" Grid.Column="0" Style="{StaticResource Card}">
+                        <VerticalStackLayout>
+                            <Label Text="Tổng sản phẩm" Style="{StaticResource Caption}"/>
+                            <Label Text="{Binding Stats.TotalProducts}" 
+                                   Style="{StaticResource Subtitle}"/>
+                        </VerticalStackLayout>
+                    </Frame>
+
+                    <!-- Low Stock -->
+                    <Frame Grid.Row="2" Grid.Column="1" Style="{StaticResource Card}">
+                        <VerticalStackLayout>
+                            <Label Text="Sắp hết hàng" Style="{StaticResource Caption}"/>
+                            <Label Text="{Binding Stats.LowStockProducts}" 
+                                   Style="{StaticResource Subtitle}"
+                                   TextColor="{StaticResource Warning}"/>
+                        </VerticalStackLayout>
+                    </Frame>
+
+                    <!-- Total Customers -->
+                    <Frame Grid.Row="3" Grid.ColumnSpan="2" Style="{StaticResource Card}">
+                        <HorizontalStackLayout Spacing="16">
+                            <VerticalStackLayout>
+                                <Label Text="Tổng khách hàng" Style="{StaticResource Caption}"/>
+                                <Label Text="{Binding Stats.TotalCustomers}" 
+                                       Style="{StaticResource Subtitle}"/>
+                            </VerticalStackLayout>
+                        </HorizontalStackLayout>
+                    </Frame>
+                </Grid>
+
+                <!-- Loading -->
+                <ActivityIndicator IsRunning="{Binding IsLoading}"
+                                   IsVisible="{Binding IsLoading}"
+                                   HorizontalOptions="Center"/>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </RefreshView>
+
+</ContentPage>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="QuanLyTiemDaQuy.Maui.Views.CustomersPage"
+             Title="Khách hàng">
+
+    <Grid RowDefinitions="Auto,*">
+        <!-- Search Bar -->
+        <Frame Grid.Row="0" Margin="16,16,16,0" Padding="8" CornerRadius="8">
+            <Grid ColumnDefinitions="*,Auto">
+                <Entry Placeholder="Tìm kiếm khách hàng..."
+                       Text="{Binding SearchText}"
+                       ReturnCommand="{Binding SearchCommand}"/>
+                <Button Grid.Column="1" 
+                        Text="🔍" 
+                        Command="{Binding SearchCommand}"
+                        BackgroundColor="Transparent"
+                        TextColor="{StaticResource Primary}"/>
+            </Grid>
+        </Frame>
+
+        <!-- Customers List -->
+        <RefreshView Grid.Row="1" 
+                     IsRefreshing="{Binding IsRefreshing}"
+                     Command="{Binding RefreshCommand}">
+            <CollectionView ItemsSource="{Binding Customers}"
+                            SelectionMode="Single"
+                            SelectedItem="{Binding SelectedCustomer}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Margin="16,8" Padding="12" Style="{StaticResource Card}">
+                            <Grid ColumnDefinitions="50,*,Auto" ColumnSpacing="12">
+                                <!-- Avatar -->
+                                <Frame Grid.Column="0" 
+                                       BackgroundColor="{StaticResource Primary}"
+                                       CornerRadius="25"
+                                       WidthRequest="50"
+                                       HeightRequest="50"
+                                       Padding="0">
+                                    <Label Text="👤" 
+                                           FontSize="24" 
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center"/>
+                                </Frame>
+
+                                <!-- Customer Info -->
+                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                    <Label Text="{Binding Name}" FontAttributes="Bold"/>
+                                    <Label Text="{Binding Phone}" Style="{StaticResource Caption}"/>
+                                    <Label Text="{Binding Email}" 
+                                           Style="{StaticResource Caption}"
+                                           LineBreakMode="TailTruncation"/>
+                                </VerticalStackLayout>
+
+                                <!-- Tier Badge -->
+                                <Frame Grid.Column="2" 
+                                       VerticalOptions="Center"
+                                       Padding="8,4"
+                                       CornerRadius="12"
+                                       BackgroundColor="{StaticResource Primary}">
+                                    <Label Text="{Binding Tier}" 
+                                           TextColor="White"
+                                           FontSize="12"/>
+                                </Frame>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout VerticalOptions="Center" 
+                                         HorizontalOptions="Center"
+                                         Padding="32">
+                        <Label Text="👥" FontSize="48" HorizontalTextAlignment="Center"/>
+                        <Label Text="Không có khách hàng" HorizontalTextAlignment="Center"/>
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+            </CollectionView>
+        </RefreshView>
+
+        <ActivityIndicator Grid.Row="1"
+                           IsRunning="{Binding IsLoading}"
+                           IsVisible="{Binding IsLoading}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+    </Grid>
+
+</ContentPage>

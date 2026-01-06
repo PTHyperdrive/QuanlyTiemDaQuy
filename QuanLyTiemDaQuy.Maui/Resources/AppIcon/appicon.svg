@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="diamondGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#B9F2FF;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#6750A4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#381E72;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Diamond shape -->
+  <polygon points="256,32 400,160 256,480 112,160" fill="url(#diamondGrad)" stroke="#381E72" stroke-width="4"/>
+  <!-- Diamond facets -->
+  <polygon points="256,32 320,160 256,200 192,160" fill="rgba(255,255,255,0.3)"/>
+  <polygon points="256,200 320,160 256,480" fill="rgba(0,0,0,0.1)"/>
+</svg>

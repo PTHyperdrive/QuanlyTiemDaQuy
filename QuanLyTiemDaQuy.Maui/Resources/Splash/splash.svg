@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="456" height="456" viewBox="0 0 456 456" xmlns="http://www.w3.org/2000/svg">
+  <!-- Diamond splash icon -->
+  <polygon points="228,28 356,128 228,428 100,128" fill="white" stroke="white" stroke-width="2"/>
+  <polygon points="228,28 292,128 228,168 164,128" fill="rgba(255,255,255,0.7)"/>
+</svg>
