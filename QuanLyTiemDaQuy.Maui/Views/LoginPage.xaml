@@ -110,7 +110,7 @@
             </Frame>
 
             <!-- Footer -->
-            <Label Text="© 2024 Quản Lý Tiệm Đá Quý"
+            <Label Text="© 2026 Quản Lý Tiệm Đá Quý"
                    Style="{StaticResource Caption}"
                    TextColor="{StaticResource Gray300}"
                    HorizontalTextAlignment="Center"/>

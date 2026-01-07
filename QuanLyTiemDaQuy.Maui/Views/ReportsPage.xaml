@@ -64,7 +64,7 @@
                 </CollectionView>
 
                 <!-- Inventory Status -->
-                <Label Text="Tình trạng kho" Style="{StaticResource Subtitle}"/>
+                <Label Text="Thông tin mua bán trong ngày" Style="{StaticResource Subtitle}"/>
                 
                 <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
                     <Frame Style="{StaticResource Card}">

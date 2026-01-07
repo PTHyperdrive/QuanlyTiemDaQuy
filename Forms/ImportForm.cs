@@ -326,9 +326,8 @@ namespace QuanLyTiemDaQuy.Forms
                 
                 return false; // LUÔN return false - bắt buộc xác minh GIA
             }
-
-            // Các loại chứng chỉ khác (IGI, HRD, AGS, Gübelin) - cho phép thêm
-            return true;
+            
+            return true; // Các loại chứng chỉ khác - cho phép thêm
         }
 
         #endregion
