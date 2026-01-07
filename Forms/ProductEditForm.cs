@@ -1,5 +1,6 @@
 using System;
 using System.Windows.Forms;
+using System.Linq;
 using QuanLyTiemDaQuy.BLL.Services;
 using QuanLyTiemDaQuy.Models;
 
@@ -83,15 +84,15 @@ namespace QuanLyTiemDaQuy.Forms
             }
         }
 
-        // ComboBox chứng chỉ - được tạo động
-        private ComboBox cboCertificate;
+        // TextBox chứng chỉ - được tạo động
+        private TextBox txtCertificate;
         private Label lblCertificate;
 
         private void LoadCertificates()
         {
             try
             {
-                // Tạo label và combobox cho chứng chỉ
+                // Tạo label và textbox cho chứng chỉ
                 lblCertificate = new Label
                 {
                     AutoSize = true,
@@ -101,20 +102,17 @@ namespace QuanLyTiemDaQuy.Forms
                     Text = "📜 Chứng chỉ (*BẮT BUỘC):"
                 };
 
-                cboCertificate = new ComboBox
+                txtCertificate = new TextBox
                 {
                     BackColor = System.Drawing.Color.FromArgb(50, 50, 70),
-                    DropDownStyle = ComboBoxStyle.DropDownList,
-                    FlatStyle = FlatStyle.Flat,
+                    BorderStyle = BorderStyle.FixedSingle,
                     Font = new System.Drawing.Font("Segoe UI", 10F),
                     ForeColor = System.Drawing.Color.White,
                     Location = new System.Drawing.Point(230, 332),
-                    Size = new System.Drawing.Size(200, 25),
-                    DisplayMember = "DisplayName",
-                    ValueMember = "CertId"
+                    Size = new System.Drawing.Size(200, 25)
                 };
 
-                // Thêm vào form - fix: kiểm tra trước khi truy cập
+                // Thêm vào form
                 var pnlMainControls = this.Controls.Find("pnlMain", true);
                 if (pnlMainControls.Length > 0)
                 {
@@ -125,31 +123,14 @@ namespace QuanLyTiemDaQuy.Forms
                         if (pnlContent != null)
                         {
                             pnlContent.Controls.Add(lblCertificate);
-                            pnlContent.Controls.Add(cboCertificate);
+                            pnlContent.Controls.Add(txtCertificate);
                         }
                     }
                 }
-
-                // Load danh sách chứng chỉ
-                var certificates = _productService.GetAllCertificates();
-                cboCertificate.Items.Clear();
-                cboCertificate.Items.Add(new CertificateItem { CertId = 0, DisplayName = "-- Chọn chứng chỉ --" });
-                
-                foreach (var cert in certificates)
-                {
-                    cboCertificate.Items.Add(new CertificateItem 
-                    { 
-                        CertId = cert.CertId, 
-                        DisplayName = $"{cert.CertCode} ({cert.Issuer})"
-                    });
-                }
-                
-                if (cboCertificate.Items.Count > 0)
-                    cboCertificate.SelectedIndex = 0;
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Lỗi tải chứng chỉ: {ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Lỗi tạo control chứng chỉ: {ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -179,6 +160,12 @@ namespace QuanLyTiemDaQuy.Forms
             nudCostPrice.Value = _product.CostPrice;
             nudSellPrice.Value = _product.SellPrice;
             txtDisplayLocation.Text = _product.DisplayLocation;
+            
+            // Set certificate info if available
+            if (txtCertificate != null)
+            {
+                 txtCertificate.Text = _product.CertCode; 
+            }
 
             // Select stone type
             for (int i = 0; i < cboStoneType.Items.Count; i++)
@@ -252,11 +239,46 @@ namespace QuanLyTiemDaQuy.Forms
                 return;
             }
 
-            // Lấy CertId từ combobox chứng chỉ
-            int certId = 0;
-            if (cboCertificate != null && cboCertificate.SelectedItem is CertificateItem certItem)
+            if (txtCertificate != null && string.IsNullOrWhiteSpace(txtCertificate.Text))
             {
-                certId = certItem.CertId;
+                 MessageBox.Show("Vui lòng nhập chứng chỉ (BẮT BUỘC)!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                 txtCertificate.Focus();
+                 return;
+            }
+
+            // Xử lý chứng chỉ: Find or Create
+            int certId = 0;
+            if (txtCertificate != null)
+            {
+                string inputCertCode = txtCertificate.Text.Trim();
+                var allCerts = _productService.GetAllCertificates();
+                var existingCert = allCerts.FirstOrDefault(c => c.CertCode.Equals(inputCertCode, StringComparison.OrdinalIgnoreCase));
+                
+                if (existingCert != null)
+                {
+                    certId = existingCert.CertId;
+                }
+                else
+                {
+                    // Create new
+                    var newCert = new Certificate 
+                    { 
+                        CertCode = inputCertCode, 
+                        Issuer = "Nội bộ/Khác", // Default issuer 
+                        IssueDate = DateTime.Now,
+                        CreatedAt = DateTime.Now
+                    };
+                    var addResult = _productService.AddCertificate(newCert);
+                    if (addResult.Success)
+                    {
+                        certId = addResult.CertId;
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Không thể tạo chứng chỉ mới: {addResult.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                }
             }
 
             // Build product object
