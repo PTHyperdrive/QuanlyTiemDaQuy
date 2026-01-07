@@ -175,17 +175,15 @@ dist/
 
 | Vai trò | Tên đăng nhập | Mật khẩu |
 |---------|---------------|----------|
-| Admin | `admin` | `Admin@123` |
-| Manager | `manager` | `Manager@123` |
-| Sales | `sales` | `Sales@123` |
+| Admin | `admin` | `admin123` |
+| Manager | `manager` | `manager123` |
+| Sales | `nv01` | `nv123` |
 
 ---
 
 ## 📞 Hỗ Trợ
 
-- **Email**: support@jewelry-pos.vn
-- **Hotline**: 1900-XXX-XXX
-- **Tài liệu**: [Wiki](./docs/wiki.md)
+- **Email**: support@notrespond.com
 
 ---
 
