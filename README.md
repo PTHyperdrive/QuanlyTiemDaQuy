@@ -140,7 +140,7 @@ QuanlyTiemDaQuy/
 | Bản quyền | Mã | Tính năng |
 |-----------|------|----------|
 | **Full** | `QLTDQ-FULL-2505-2004` | Đầy đủ tính năng, không giới hạn thiết bị |
-| **POS** | `QLTDQ-POS-2505-2004` | Chỉ Bán hàng, Sản phẩm, Khách hàng |
+| **POS Mobile** | `QLTDQ-POS-2505-2004` | Chỉ Bán hàng, Sản phẩm, Khách hàng |
 | **POS Embedded** | `QLTDQ-POSE-2505-2004` | Tối ưu cho thiết bị embedded |
 
 ---
