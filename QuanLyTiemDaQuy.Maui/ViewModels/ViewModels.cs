@@ -5,6 +5,7 @@ using QuanLyTiemDaQuy.Core.Interfaces;
 using QuanLyTiemDaQuy.Core.Models;
 using QuanLyTiemDaQuy.Maui.Messages;
 using QuanLyTiemDaQuy.Maui.Views;
+using QuanLyTiemDaQuy.Maui.Services;
 
 namespace QuanLyTiemDaQuy.Maui.ViewModels;
 
@@ -294,14 +295,12 @@ public partial class CustomersViewModel : ObservableObject
     {
         if (customer == null) return;
         
-        // Navigate to SalesPage and pass customer
-        // We can communicate via Messenger or query parameters. 
-        // Using Messenger for decoupled communication is cleaner in MVVM Toolkit.
-        WeakReferenceMessenger.Default.Send(new CustomerSelectedMessage(customer));
-        
-        // Find the Sales tab via route or index. Assuming Sales is usually the 4th tab (Dashboard, Products, Customers, Sales...)
-        // Or route navigation: //SalesPage
-        await Shell.Current.GoToAsync($"//{nameof(SalesPage)}");
+        // Navigate to SalesPage and pass customer via QueryProperty
+        var navigationParameter = new Dictionary<string, object>
+        {
+            { "SelectedCustomer", customer }
+        };
+        await Shell.Current.GoToAsync($"//{nameof(SalesPage)}", navigationParameter);
         
         // Reset selection
         SelectedCustomer = null;
@@ -309,12 +308,17 @@ public partial class CustomersViewModel : ObservableObject
 }
 
 
-public partial class SalesViewModel : ObservableObject, IRecipient<CustomerSelectedMessage>
+public partial class SalesViewModel : ObservableObject, IQueryAttributable
 {
     private readonly ISalesService _salesService;
     private readonly IProductService _productService;
     private readonly ICustomerService _customerService;
     private readonly IDiscountService _discountService;
+    private readonly ICacheService _cacheService;
+    
+    // Cache TTL configurations
+    private static readonly TimeSpan ProductsCacheTtl = TimeSpan.FromMinutes(5);
+    private static readonly TimeSpan CustomersCacheTtl = TimeSpan.FromMinutes(10);
     
     private List<Invoice> _invoices = [];
     private List<Product> _availableProducts = [];
@@ -358,20 +362,36 @@ public partial class SalesViewModel : ObservableObject, IRecipient<CustomerSelec
     public SalesViewModel(ISalesService salesService, 
         IProductService productService, 
         ICustomerService customerService,
-        IDiscountService discountService)
+        IDiscountService discountService,
+        ICacheService cacheService)
     {
         _salesService = salesService;
         _productService = productService;
         _customerService = customerService;
         _discountService = discountService;
+        _cacheService = cacheService;
 
-        WeakReferenceMessenger.Default.Register<CustomerSelectedMessage>(this);
+
     }
 
-    public void Receive(CustomerSelectedMessage message)
+    public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
-        SelectedCustomer = message.Value;
-        // CalculateTotals() is called in setter
+        if (query.TryGetValue("SelectedCustomer", out var value) && value is Customer passedCustomer)
+        {
+            // Ensure passed customer is in the list to satisfy Picker
+            var existing = CustomerList.FirstOrDefault(c => c.CustomerId == passedCustomer.CustomerId);
+            if (existing != null)
+            {
+                SelectedCustomer = existing;
+            }
+            else
+            {
+                // Add to list if missing
+                var newList = new List<Customer>(CustomerList) { passedCustomer };
+                CustomerList = newList;
+                SelectedCustomer = passedCustomer;
+            }
+        }
     }
 
     [RelayCommand]
@@ -382,11 +402,67 @@ public partial class SalesViewModel : ObservableObject, IRecipient<CustomerSelec
         {
             await Task.Run(() =>
             {
+                // Always fetch fresh invoices (real-time data)
                 Invoices = _salesService.GetTodayInvoices();
-                _allProducts = _productService.GetAllProducts();
+                
+                var cachedProducts = _cacheService.Get<List<Product>>(CacheKeys.Products);
+                if (cachedProducts != null)
+                {
+                    _allProducts = cachedProducts;
+                }
+                else
+                {
+                    _allProducts = _productService.GetAllProducts();
+                    _cacheService.Set(CacheKeys.Products, _allProducts, ProductsCacheTtl);
+                }
                 AvailableProducts = _allProducts.Where(p => p.StockQty > 0).ToList();
-                CustomerList = _customerService.GetAllCustomers();
+                
+                // Capture current selection to restore after load
+                var currentSelection = _selectedCustomer; // Access field to avoid thread issues or capture property before Task.Run
+                
+                // Try to load customers from cache first
+                var cachedCustomers = _cacheService.Get<List<Customer>>(CacheKeys.Customers);
+                List<Customer> loadedCustomers;
+                
+                if (cachedCustomers != null)
+                {
+                    loadedCustomers = cachedCustomers;
+                }
+                else
+                {
+                    loadedCustomers = _customerService.GetAllCustomers();
+                    _cacheService.Set(CacheKeys.Customers, loadedCustomers, CustomersCacheTtl);
+                }
+
+                // Restore selection if it exists
+                if (currentSelection != null)
+                {
+                    var match = loadedCustomers.FirstOrDefault(c => c.CustomerId == currentSelection.CustomerId);
+                    if (match != null)
+                    {
+                        // Found in new list, use it
+                        _selectedCustomer = match; // Update backing field, property change raised when we assign CustomerList? No.
+                        // We should update Property. But inside Task.Run?
+                        // Better to prepare the list and allow Property Setter to handle it later?
+                        // Or just ensure it's in the list.
+                    }
+                    else
+                    {
+                        // Not in loaded list (e.g. new customer not in cache), add it
+                         loadedCustomers = new List<Customer>(loadedCustomers) { currentSelection };
+                         _selectedCustomer = currentSelection;
+                    }
+                }
+                
+                CustomerList = loadedCustomers;
+                // If we updated _selectedCustomer directly, we might need to raise PropertyChanged.
+                // But changing CustomerList might trigger Picker to re-evaluate SelectedItem?
+                // Safest to re-set SelectedCustomer on MainThread or trigger change.
+
             });
+            
+            // Raise PropertyChanged for SelectedCustomer in case it was restored/modified
+            OnPropertyChanged(nameof(SelectedCustomer));
         }
         finally { IsLoading = false; IsRefreshing = false; }
     }
@@ -749,7 +825,14 @@ public partial class SalesViewModel : ObservableObject, IRecipient<CustomerSelec
     }
 
     [RelayCommand]
-    private async Task RefreshAsync() { IsRefreshing = true; await LoadDataAsync(); }
+    private async Task RefreshAsync() 
+    { 
+        IsRefreshing = true;
+        // Invalidate cache to force fresh data
+        _cacheService.Invalidate(CacheKeys.Products);
+        _cacheService.Invalidate(CacheKeys.Customers);
+        await LoadDataAsync(); 
+    }
 }
 
 public partial class ReportsViewModel : ObservableObject

@@ -46,10 +46,10 @@
                                        HeightRequest="60"
                                        Padding="4"
                                        BorderColor="{StaticResource PrimaryLight}">
-                                    <Image Source="{Binding StoneTypeName, Converter={StaticResource StoneTypeToIconConverter}}" 
-                                           Aspect="AspectFit"
-                                           WidthRequest="48"
-                                           HeightRequest="48"/>
+                                    <Label Text="{Binding StoneTypeName, Converter={StaticResource StoneTypeToIconConverter}}" 
+                                           FontSize="32"
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center"/>
                                 </Frame>
 
                                 <!-- Product Info -->

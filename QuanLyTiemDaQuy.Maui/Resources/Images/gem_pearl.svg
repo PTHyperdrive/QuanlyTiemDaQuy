@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <radialGradient id="pearlGrad" cx="30%" cy="30%" r="70%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:1" />
+      <stop offset="40%" style="stop-color:#F5F5F5;stop-opacity:1" />
+      <stop offset="70%" style="stop-color:#E8E8E8;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#D4D4D4;stop-opacity:1" />
+    </radialGradient>
+    <radialGradient id="pearlShine" cx="25%" cy="25%" r="30%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#FFFFFF;stop-opacity:0" />
+    </radialGradient>
+  </defs>
+  <circle cx="50" cy="50" r="38" fill="url(#pearlGrad)" stroke="#BEBEBE" stroke-width="1"/>
+  <ellipse cx="38" cy="38" rx="12" ry="10" fill="url(#pearlShine)"/>
+  <ellipse cx="32" cy="32" rx="5" ry="4" fill="#FFFFFF" opacity="0.8"/>
+</svg>

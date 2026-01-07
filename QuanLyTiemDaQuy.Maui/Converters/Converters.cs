@@ -91,28 +91,33 @@ public class StockToColorConverter : IValueConverter
 }
 
 /// <summary>
-/// Converts stone type name to image source for gemstone icons
+/// Converts stone type name to emoji icon for gemstones
+/// Using emoji for reliable cross-platform display
 /// </summary>
 public class StoneTypeToIconConverter : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        string imageName = "diamond.png"; // Default
+        // Default diamond emoji
+        string emoji = "💎";
         
         if (value is string typeName && !string.IsNullOrEmpty(typeName))
         {
             string lower = typeName.ToLower();
             if (lower.Contains("ruby") || lower.Contains("hồng ngọc"))
-                imageName = "ruby.png";
-            else if (lower.Contains("emerald") || lower.Contains("lục bảo"))
-                imageName = "emerald.png";
+                emoji = "❤️"; // Ruby - red heart
+            else if (lower.Contains("emerald") || lower.Contains("lục bảo") || lower.Contains("ngọc lục bảo"))
+                emoji = "💚"; // Emerald - green heart
             else if (lower.Contains("sapphire") || lower.Contains("sa phia") || lower.Contains("bích ngọc"))
-                imageName = "sapphire.png";
-            else if (lower.Contains("kim cương") || lower.Contains("diamond"))
-                imageName = "diamond.png";
+                emoji = "💙"; // Sapphire - blue heart
+            else if (lower.Contains("pearl") || lower.Contains("ngọc trai"))
+                emoji = "🤍"; // Pearl - white heart
+            else if (lower.Contains("quartz") || lower.Contains("thạch anh"))
+                emoji = "💜"; // Quartz - purple heart
+            // Diamond uses 💎 (default)
         }
         
-        return imageName;
+        return emoji;
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

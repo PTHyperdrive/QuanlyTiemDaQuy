@@ -40,6 +40,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
                     SUM(Total) AS NetRevenue
                 FROM Invoices
                 WHERE CAST(InvoiceDate AS DATE) BETWEEN @FromDate AND @ToDate
+                  AND Status = N'Đã xuất'
                 GROUP BY CAST(InvoiceDate AS DATE)
                 ORDER BY Date";
 
@@ -84,6 +85,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
                     ), 0) AS TotalCost
                 FROM Invoices i
                 WHERE YEAR(InvoiceDate) = @Year
+                  AND Status = N'Đã xuất'
                 GROUP BY YEAR(InvoiceDate), MONTH(InvoiceDate)
                 ORDER BY Month";
 
@@ -123,6 +125,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
                 INNER JOIN Products p ON id.ProductId = p.ProductId
                 INNER JOIN StoneTypes st ON p.StoneTypeId = st.StoneTypeId
                 WHERE CAST(i.InvoiceDate AS DATE) BETWEEN @FromDate AND @ToDate
+                  AND i.Status = N'Đã xuất'
                 GROUP BY p.ProductId, p.ProductCode, p.Name, st.Name
                 ORDER BY TotalQtySold DESC";
 
@@ -225,27 +228,27 @@ namespace QuanLyTiemDaQuy.BLL.Services
 
             // Today's revenue
             result = DatabaseHelper.ExecuteScalar(
-                "SELECT ISNULL(SUM(Total), 0) FROM Invoices WHERE CAST(InvoiceDate AS DATE) = @Today",
+                "SELECT ISNULL(SUM(Total), 0) FROM Invoices WHERE CAST(InvoiceDate AS DATE) = @Today AND Status = N'Đã xuất'",
                 DatabaseHelper.CreateParameter("@Today", DateTime.Today));
             stats.TodayRevenue = Convert.ToDecimal(result);
 
             // Today's invoices
             result = DatabaseHelper.ExecuteScalar(
-                "SELECT COUNT(*) FROM Invoices WHERE CAST(InvoiceDate AS DATE) = @Today",
+                "SELECT COUNT(*) FROM Invoices WHERE CAST(InvoiceDate AS DATE) = @Today AND Status = N'Đã xuất'",
                 DatabaseHelper.CreateParameter("@Today", DateTime.Today));
             stats.TodayInvoices = Convert.ToInt32(result);
 
             // This month's revenue
             var firstDayOfMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
             result = DatabaseHelper.ExecuteScalar(
-                "SELECT ISNULL(SUM(Total), 0) FROM Invoices WHERE InvoiceDate >= @FirstDay AND InvoiceDate < @NextMonth",
+                "SELECT ISNULL(SUM(Total), 0) FROM Invoices WHERE InvoiceDate >= @FirstDay AND InvoiceDate < @NextMonth AND Status = N'Đã xuất'",
                 DatabaseHelper.CreateParameter("@FirstDay", firstDayOfMonth),
                 DatabaseHelper.CreateParameter("@NextMonth", firstDayOfMonth.AddMonths(1)));
             stats.MonthRevenue = Convert.ToDecimal(result);
 
             // This month's invoices
             result = DatabaseHelper.ExecuteScalar(
-                "SELECT COUNT(*) FROM Invoices WHERE InvoiceDate >= @FirstDay AND InvoiceDate < @NextMonth",
+                "SELECT COUNT(*) FROM Invoices WHERE InvoiceDate >= @FirstDay AND InvoiceDate < @NextMonth AND Status = N'Đã xuất'",
                 DatabaseHelper.CreateParameter("@FirstDay", firstDayOfMonth),
                 DatabaseHelper.CreateParameter("@NextMonth", firstDayOfMonth.AddMonths(1)));
             stats.MonthInvoices = Convert.ToInt32(result);

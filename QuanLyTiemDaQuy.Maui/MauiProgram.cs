@@ -4,6 +4,7 @@ using QuanLyTiemDaQuy.Core.DAL.Repositories;
 using QuanLyTiemDaQuy.Core.BLL.Services;
 using QuanLyTiemDaQuy.Maui.ViewModels;
 using QuanLyTiemDaQuy.Maui.Views;
+using QuanLyTiemDaQuy.Maui.Services;
 
 namespace QuanLyTiemDaQuy.Maui;
 
@@ -40,12 +41,15 @@ public static class MauiProgram
         builder.Services.AddSingleton<IMarketPriceApiService, MarketPriceApiService>();
         builder.Services.AddSingleton<IDiscountService, DiscountService>();
 
+        // Register Cache Service
+        builder.Services.AddSingleton<ICacheService, CacheService>();
+
         // Register ViewModels
         builder.Services.AddTransient<LoginViewModel>();
         builder.Services.AddTransient<DashboardViewModel>();
         builder.Services.AddTransient<ProductsViewModel>();
         builder.Services.AddTransient<CustomersViewModel>();
-        builder.Services.AddTransient<SalesViewModel>();
+        builder.Services.AddSingleton<SalesViewModel>();
         builder.Services.AddTransient<ReportsViewModel>();
 
         // Register Pages
@@ -53,7 +57,7 @@ public static class MauiProgram
         builder.Services.AddTransient<DashboardPage>();
         builder.Services.AddTransient<ProductsPage>();
         builder.Services.AddTransient<CustomersPage>();
-        builder.Services.AddTransient<SalesPage>();
+        builder.Services.AddSingleton<SalesPage>();
         builder.Services.AddTransient<ReportsPage>();
 
 #if DEBUG
