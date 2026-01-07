@@ -56,6 +56,9 @@ namespace QuanLyTiemDaQuy.Forms
 
             // Chỉ Manager trở lên mới xem được Nhà cung cấp
             btnSuppliers.Visible = employee.IsManager;
+
+            // Chỉ Admin hoặc Director mới được vào trang Giảm giá (Manager và Sales không được)
+            btnDiscounts.Visible = employee.Role == "Admin" || employee.Role == "Director";
         }
 
         private void LoadDashboardStats()
