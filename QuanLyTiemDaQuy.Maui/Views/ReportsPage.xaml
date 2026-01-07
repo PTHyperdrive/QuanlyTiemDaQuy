@@ -92,11 +92,12 @@
                     </Frame>
                     <Frame Style="{StaticResource Card}">
                         <VerticalStackLayout HorizontalOptions="Center">
-                            <Label Text="{Binding Stats.TotalCustomers}" 
+                            <Label Text="{Binding Stats.TodayNewCustomers}" 
                                    FontSize="24" 
                                    FontAttributes="Bold"
+                                   TextColor="{StaticResource Success}"
                                    HorizontalTextAlignment="Center"/>
-                            <Label Text="Khách hàng" 
+                            <Label Text="KH mới hôm nay" 
                                    Style="{StaticResource Caption}"
                                    HorizontalTextAlignment="Center"/>
                         </VerticalStackLayout>

@@ -225,11 +225,11 @@ namespace QuanLyTiemDaQuy.DAL.Repositories
         }
 
         /// <summary>
-        /// Sinh mã hóa đơn tự động
+        /// Sinh mã hóa đơn tự động với mã chi nhánh
         /// </summary>
-        public string GenerateInvoiceCode()
+        public string GenerateInvoiceCode(string branchCode = "HD")
         {
-            string prefix = "HD" + DateTime.Now.ToString("yyyyMMdd");
+            string prefix = branchCode + DateTime.Now.ToString("yyyyMMdd");
             string query = @"
                 SELECT TOP 1 InvoiceCode FROM Invoices 
                 WHERE InvoiceCode LIKE @Prefix + '%' 

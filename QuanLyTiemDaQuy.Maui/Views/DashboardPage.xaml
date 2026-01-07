@@ -4,6 +4,11 @@
              x:Class="QuanLyTiemDaQuy.Maui.Views.DashboardPage"
              Title="Dashboard">
 
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="🚪 Đăng xuất" Command="{Binding LogoutCommand}" Order="Primary"/>
+        <ToolbarItem Text="❌ Thoát" Command="{Binding ExitCommand}" Order="Primary"/>
+    </ContentPage.ToolbarItems>
+
     <RefreshView IsRefreshing="{Binding IsRefreshing}"
                  Command="{Binding RefreshCommand}">
         <ScrollView>

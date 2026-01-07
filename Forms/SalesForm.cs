@@ -223,12 +223,18 @@ namespace QuanLyTiemDaQuy.Forms
             var selectedCustomer = cboCustomer.SelectedItem as Customer;
             if (selectedCustomer != null && selectedCustomer.CustomerId > 0)
             {
-                // Tự động set chiết khấu theo tier khách hàng
-                decimal tierDiscount = selectedCustomer.DiscountPercent;
-                if (tierDiscount > nudDiscount.Value)
+                // Lấy chiết khấu từ tier khách hàng (từ service để đảm bảo chính xác)
+                decimal tierDiscount = _salesService.GetCustomerTierDiscount(selectedCustomer.CustomerId);
+                // Luôn cập nhật nếu tier discount > 0, hoặc nếu lớn hơn giá trị hiện tại
+                if (tierDiscount > 0)
                 {
                     nudDiscount.Value = tierDiscount;
                 }
+            }
+            else
+            {
+                // Khách lẻ - reset discount
+                nudDiscount.Value = 0;
             }
             UpdateTotals();
         }
@@ -376,22 +382,28 @@ namespace QuanLyTiemDaQuy.Forms
                 return;
             }
 
+            // Lấy chiết khấu từ tier khách hàng (ưu tiên tier discount nếu cao hơn)
+            decimal manualDiscount = (decimal)nudDiscount.Value;
+            int customerId = 0;
+            var selectedCustomer = cboCustomer.SelectedItem as Customer;
+            if (selectedCustomer != null && selectedCustomer.CustomerId > 0)
+            {
+                customerId = selectedCustomer.CustomerId;
+                decimal tierDiscount = _salesService.GetCustomerTierDiscount(customerId);
+                manualDiscount = Math.Max(manualDiscount, tierDiscount);
+            }
+
             // Chuẩn bị hoá đơn
             var invoice = new Invoice
             {
                 Details = new List<InvoiceDetail>(_cart),
-                DiscountPercent = (decimal)nudDiscount.Value,
+                DiscountPercent = manualDiscount,
                 VAT = (decimal)nudVAT.Value,
                 PaymentMethod = cboPaymentMethod.SelectedItem?.ToString() ?? "Tiền mặt",
-                EmployeeId = EmployeeService.CurrentEmployee?.EmployeeId ?? 1
+                EmployeeId = EmployeeService.CurrentEmployee?.EmployeeId ?? 1,
+                BranchId = EmployeeService.CurrentEmployee?.BranchId ?? 1,
+                CustomerId = customerId
             };
-
-            // Đặt khách hàng
-            var selectedCustomer = cboCustomer.SelectedItem as Customer;
-            if (selectedCustomer != null && selectedCustomer.CustomerId > 0)
-            {
-                invoice.CustomerId = selectedCustomer.CustomerId;
-            }
 
             // Tạo hoá đơn
             var result = _salesService.CreateInvoice(invoice);
@@ -466,23 +478,29 @@ namespace QuanLyTiemDaQuy.Forms
                 return;
             }
 
+            // Lấy chiết khấu từ tier khách hàng (ưu tiên tier discount nếu cao hơn)
+            decimal manualDiscount = (decimal)nudDiscount.Value;
+            int customerId = 0;
+            var selectedCustomer = cboCustomer.SelectedItem as Customer;
+            if (selectedCustomer != null && selectedCustomer.CustomerId > 0)
+            {
+                customerId = selectedCustomer.CustomerId;
+                decimal tierDiscount = _salesService.GetCustomerTierDiscount(customerId);
+                manualDiscount = Math.Max(manualDiscount, tierDiscount);
+            }
+
             // Tạo hoá đơn pending (không auto complete)
             var invoice = new Invoice
             {
                 Details = new List<InvoiceDetail>(_cart),
-                DiscountPercent = (decimal)nudDiscount.Value,
+                DiscountPercent = manualDiscount,
                 VAT = (decimal)nudVAT.Value,
                 PaymentMethod = cboPaymentMethod.SelectedItem?.ToString() ?? "Tiền mặt",
                 EmployeeId = EmployeeService.CurrentEmployee?.EmployeeId ?? 1,
                 BranchId = branchId,
-                Status = InvoiceStatus.Pending
+                Status = InvoiceStatus.Pending,
+                CustomerId = customerId
             };
-
-            var selectedCustomer = cboCustomer.SelectedItem as Customer;
-            if (selectedCustomer != null && selectedCustomer.CustomerId > 0)
-            {
-                invoice.CustomerId = selectedCustomer.CustomerId;
-            }
 
             var result = _salesService.CreateInvoice(invoice, autoComplete: false);
 

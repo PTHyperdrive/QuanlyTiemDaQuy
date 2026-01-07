@@ -136,6 +136,27 @@ public partial class DashboardViewModel : ObservableObject
 
     [RelayCommand]
     private async Task RefreshAsync() { IsRefreshing = true; await LoadDataAsync(); }
+
+    [RelayCommand]
+    private async Task LogoutAsync()
+    {
+        bool confirm = await Shell.Current.DisplayAlert("Đăng xuất", "Bạn có chắc muốn đăng xuất?", "Đăng xuất", "Hủy");
+        if (confirm)
+        {
+            _employeeService.CurrentEmployee = null;
+            Application.Current!.MainPage = new Views.LoginPage();
+        }
+    }
+
+    [RelayCommand]
+    private async Task ExitAsync()
+    {
+        bool confirm = await Shell.Current.DisplayAlert("Thoát", "Bạn có chắc muốn thoát ứng dụng?", "Thoát", "Hủy");
+        if (confirm)
+        {
+            Application.Current!.Quit();
+        }
+    }
 }
 
 public partial class ProductsViewModel : ObservableObject
@@ -384,8 +405,14 @@ public partial class SalesViewModel : ObservableObject, IRecipient<CustomerSelec
     }
 
     [RelayCommand]
-    private void AddToCart(Product product)
+    private async Task AddToCart(Product product)
     {
+        if (SelectedCustomer == null)
+        {
+            await Shell.Current.DisplayAlert("Thông báo", "Bạn phải chọn khách hàng", "OK");
+            return;
+        }
+
         if (product == null || product.StockQty <= 0) return;
         
         var existingItem = CartItems.FirstOrDefault(c => c.ProductId == product.ProductId);
@@ -464,6 +491,12 @@ public partial class SalesViewModel : ObservableObject, IRecipient<CustomerSelec
     [RelayCommand]
     private async Task SavePendingAsync()
     {
+        if (SelectedCustomer == null)
+        {
+            await Shell.Current.DisplayAlert("Thông báo", "Bạn phải chọn khách hàng", "OK");
+            return;
+        }
+
         if (!CartItems.Any())
         {
             await Shell.Current.DisplayAlert("Thông báo", "Giỏ hàng trống!", "OK");
@@ -611,6 +644,12 @@ public partial class SalesViewModel : ObservableObject, IRecipient<CustomerSelec
     [RelayCommand]
     private async Task CheckoutAsync()
     {
+        if (SelectedCustomer == null)
+        {
+            await Shell.Current.DisplayAlert("Thông báo", "Bạn phải chọn khách hàng", "OK");
+            return;
+        }
+
         if (!CartItems.Any())
         {
             await Shell.Current.DisplayAlert("Thông báo", "Giỏ hàng trống!", "OK");
@@ -618,6 +657,8 @@ public partial class SalesViewModel : ObservableObject, IRecipient<CustomerSelec
         }
 
         bool confirm = await Shell.Current.DisplayAlert(
+            "Xác nhận thanh toán",
+            $"Tổng tiền: {Total:N0} ₫\nBạn có chắc muốn thanh toán?",
             "Thanh toán", "Hủy");
 
         if (!confirm) return;

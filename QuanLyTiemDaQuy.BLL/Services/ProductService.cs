@@ -92,6 +92,16 @@ namespace QuanLyTiemDaQuy.BLL.Services
             if (product.Carat <= 0)
                 return (false, "Carat phải lớn hơn 0", 0);
 
+            // ⚠️ BẮT BUỘC: Đá quý phải có chứng chỉ hợp lệ mới được thu mua
+            // Theo quy chuẩn quốc tế về đá quý (GIA, IGI, HRD, AGS, Gübelin)
+            if (product.CertId <= 0)
+                return (false, "Sản phẩm đá quý BẮT BUỘC phải có chứng chỉ hợp lệ từ tổ chức uy tín (GIA, IGI, HRD, AGS, Gübelin)", 0);
+            
+            // Verify certificate exists in database
+            var certificate = _certificateRepository.GetById(product.CertId);
+            if (certificate == null)
+                return (false, "Chứng chỉ không tồn tại trong hệ thống. Vui lòng thêm chứng chỉ trước.", 0);
+
             try
             {
                 int productId = _productRepository.Insert(product);

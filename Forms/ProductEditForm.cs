@@ -41,6 +41,7 @@ namespace QuanLyTiemDaQuy.Forms
         private void ProductEditForm_Load(object sender, EventArgs e)
         {
             LoadStoneTypes();
+            LoadCertificates(); // Load danh sách chứng chỉ
             
             if (_isEditMode)
             {
@@ -80,6 +81,84 @@ namespace QuanLyTiemDaQuy.Forms
             {
                 MessageBox.Show($"Lỗi tải loại đá: {ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        // ComboBox chứng chỉ - được tạo động
+        private ComboBox cboCertificate;
+        private Label lblCertificate;
+
+        private void LoadCertificates()
+        {
+            try
+            {
+                // Tạo label và combobox cho chứng chỉ
+                lblCertificate = new Label
+                {
+                    AutoSize = true,
+                    Font = new System.Drawing.Font("Segoe UI", 10F),
+                    ForeColor = System.Drawing.Color.White,
+                    Location = new System.Drawing.Point(230, 310),
+                    Text = "📜 Chứng chỉ (*BẮT BUỘC):"
+                };
+
+                cboCertificate = new ComboBox
+                {
+                    BackColor = System.Drawing.Color.FromArgb(50, 50, 70),
+                    DropDownStyle = ComboBoxStyle.DropDownList,
+                    FlatStyle = FlatStyle.Flat,
+                    Font = new System.Drawing.Font("Segoe UI", 10F),
+                    ForeColor = System.Drawing.Color.White,
+                    Location = new System.Drawing.Point(230, 332),
+                    Size = new System.Drawing.Size(200, 25),
+                    DisplayMember = "DisplayName",
+                    ValueMember = "CertId"
+                };
+
+                // Thêm vào form - fix: kiểm tra trước khi truy cập
+                var pnlMainControls = this.Controls.Find("pnlMain", true);
+                if (pnlMainControls.Length > 0)
+                {
+                    var pnlContentControls = pnlMainControls[0].Controls.Find("pnlContent", true);
+                    if (pnlContentControls.Length > 0)
+                    {
+                        var pnlContent = pnlContentControls[0] as Panel;
+                        if (pnlContent != null)
+                        {
+                            pnlContent.Controls.Add(lblCertificate);
+                            pnlContent.Controls.Add(cboCertificate);
+                        }
+                    }
+                }
+
+                // Load danh sách chứng chỉ
+                var certificates = _productService.GetAllCertificates();
+                cboCertificate.Items.Clear();
+                cboCertificate.Items.Add(new CertificateItem { CertId = 0, DisplayName = "-- Chọn chứng chỉ --" });
+                
+                foreach (var cert in certificates)
+                {
+                    cboCertificate.Items.Add(new CertificateItem 
+                    { 
+                        CertId = cert.CertId, 
+                        DisplayName = $"{cert.CertCode} ({cert.Issuer})"
+                    });
+                }
+                
+                if (cboCertificate.Items.Count > 0)
+                    cboCertificate.SelectedIndex = 0;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Lỗi tải chứng chỉ: {ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // Helper class for certificate combo
+        private class CertificateItem
+        {
+            public int CertId { get; set; }
+            public string DisplayName { get; set; }
+            public override string ToString() => DisplayName;
         }
 
         private void cboStoneType_SelectedIndexChanged(object sender, EventArgs e)
@@ -173,6 +252,13 @@ namespace QuanLyTiemDaQuy.Forms
                 return;
             }
 
+            // Lấy CertId từ combobox chứng chỉ
+            int certId = 0;
+            if (cboCertificate != null && cboCertificate.SelectedItem is CertificateItem certItem)
+            {
+                certId = certItem.CertId;
+            }
+
             // Build product object
             var product = new Product
             {
@@ -186,7 +272,8 @@ namespace QuanLyTiemDaQuy.Forms
                 StockQty = (int)nudStockQty.Value,
                 CostPrice = nudCostPrice.Value,
                 SellPrice = nudSellPrice.Value,
-                DisplayLocation = txtDisplayLocation.Text.Trim()
+                DisplayLocation = txtDisplayLocation.Text.Trim(),
+                CertId = certId  // Chứng chỉ BẮT BUỘC cho đá quý
             };
 
             if (_isEditMode)

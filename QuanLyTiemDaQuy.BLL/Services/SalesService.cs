@@ -14,6 +14,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
         private readonly ProductRepository _productRepository;
         private readonly CustomerRepository _customerRepository;
         private readonly CustomerService _customerService;
+        private readonly BranchRepository _branchRepository;
 
         public SalesService()
         {
@@ -21,6 +22,7 @@ namespace QuanLyTiemDaQuy.BLL.Services
             _productRepository = new ProductRepository();
             _customerRepository = new CustomerRepository();
             _customerService = new CustomerService();
+            _branchRepository = new BranchRepository();
         }
 
         #region Invoice Operations
@@ -51,11 +53,20 @@ namespace QuanLyTiemDaQuy.BLL.Services
         }
 
         /// <summary>
-        /// Sinh mã hóa đơn mới
+        /// Sinh mã hóa đơn mới với mã chi nhánh
         /// </summary>
-        public string GenerateInvoiceCode()
+        public string GenerateInvoiceCode(int branchId = 0)
         {
-            return _invoiceRepository.GenerateInvoiceCode();
+            string branchCode = "HD"; // Default
+            if (branchId > 0)
+            {
+                var branch = _branchRepository.GetById(branchId);
+                if (branch != null && !string.IsNullOrEmpty(branch.BranchCode))
+                {
+                    branchCode = branch.BranchCode;
+                }
+            }
+            return _invoiceRepository.GenerateInvoiceCode(branchCode);
         }
 
         #endregion
@@ -191,10 +202,10 @@ namespace QuanLyTiemDaQuy.BLL.Services
             // Calculate totals
             invoice.CalculateTotals();
 
-            // Generate invoice code
+            // Generate invoice code with branch code
             if (string.IsNullOrEmpty(invoice.InvoiceCode))
             {
-                invoice.InvoiceCode = GenerateInvoiceCode();
+                invoice.InvoiceCode = GenerateInvoiceCode(invoice.BranchId);
             }
 
             invoice.InvoiceDate = DateTime.Now;

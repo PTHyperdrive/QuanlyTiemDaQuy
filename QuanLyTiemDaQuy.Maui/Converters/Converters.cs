@@ -91,23 +91,28 @@ public class StockToColorConverter : IValueConverter
 }
 
 /// <summary>
-/// Converts stone type name to emoji icon
+/// Converts stone type name to image source for gemstone icons
 /// </summary>
 public class StoneTypeToIconConverter : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
+        string imageName = "diamond.png"; // Default
+        
         if (value is string typeName && !string.IsNullOrEmpty(typeName))
         {
             string lower = typeName.ToLower();
-            if (lower.Contains("ruby")) return "🔴";
-            if (lower.Contains("emerald") || lower.Contains("lục bảo")) return "🟢";
-            if (lower.Contains("sapphire") || lower.Contains("sa phia")) return "🔵";
-            if (lower.Contains("kim cương") || lower.Contains("diamond")) return "💎";
-            if (lower.Contains("thạch anh") || lower.Contains("quartz")) return "🔮";
-            if (lower.Contains("ngọc trai") || lower.Contains("pearl")) return "⚪";
+            if (lower.Contains("ruby") || lower.Contains("hồng ngọc"))
+                imageName = "ruby.png";
+            else if (lower.Contains("emerald") || lower.Contains("lục bảo"))
+                imageName = "emerald.png";
+            else if (lower.Contains("sapphire") || lower.Contains("sa phia") || lower.Contains("bích ngọc"))
+                imageName = "sapphire.png";
+            else if (lower.Contains("kim cương") || lower.Contains("diamond"))
+                imageName = "diamond.png";
         }
-        return "💎"; // Default
+        
+        return imageName;
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

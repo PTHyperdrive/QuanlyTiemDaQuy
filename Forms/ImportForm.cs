@@ -33,6 +33,7 @@ namespace QuanLyTiemDaQuy.Forms
             LoadClarityGrades();
             LoadCutGrades();
             LoadSuppliers();
+            LoadCertIssuers(); // Load danh sách đơn vị cấp chứng chỉ
             ClearGemstoneInput();
             UpdateCartDisplay();
         }
@@ -84,6 +85,43 @@ namespace QuanLyTiemDaQuy.Forms
             cboSupplier.SelectedIndex = 0;
         }
 
+        /// <summary>
+        /// Load danh sách tổ chức cấp chứng chỉ quốc tế
+        /// </summary>
+        private void LoadCertIssuers()
+        {
+            // Thay txtCertIssuer bằng ComboBox động
+            if (cboCertIssuer == null)
+            {
+                cboCertIssuer = new ComboBox
+                {
+                    BackColor = System.Drawing.Color.FromArgb(65, 65, 88),
+                    DropDownStyle = ComboBoxStyle.DropDownList,
+                    FlatStyle = FlatStyle.Flat,
+                    ForeColor = System.Drawing.Color.White,
+                    Location = txtCertIssuer.Location,
+                    Size = txtCertIssuer.Size,
+                    Font = txtCertIssuer.Font,
+                    TabIndex = txtCertIssuer.TabIndex
+                };
+                
+                // Thay thế txtCertIssuer bằng cboCertIssuer
+                grpCert.Controls.Remove(txtCertIssuer);
+                grpCert.Controls.Add(cboCertIssuer);
+            }
+
+            cboCertIssuer.Items.Clear();
+            cboCertIssuer.Items.Add("GIA - Gemological Institute of America");
+            cboCertIssuer.Items.Add("IGI - International Gemological Institute");
+            cboCertIssuer.Items.Add("HRD - Hoge Raad voor Diamant (Antwerp)");
+            cboCertIssuer.Items.Add("AGS - American Gem Society");
+            cboCertIssuer.Items.Add("Gübelin - Gübelin Gem Lab (Switzerland)");
+            cboCertIssuer.SelectedIndex = 0;
+        }
+
+        // Field cho ComboBox thêm vào động
+        private ComboBox cboCertIssuer;
+
         #endregion
 
         #region Stone Type Selection
@@ -122,7 +160,16 @@ namespace QuanLyTiemDaQuy.Forms
             decimal carat;
             if (!decimal.TryParse(txtCarat.Text, out carat) || carat <= 0)
             {
+                lblSuggestedPrice.ForeColor = System.Drawing.Color.Red;
                 lblSuggestedPrice.Text = "Nhập số carat hợp lệ";
+                return;
+            }
+
+            // Giới hạn carat tối đa là 8
+            if (carat > 8)
+            {
+                lblSuggestedPrice.ForeColor = System.Drawing.Color.Red;
+                lblSuggestedPrice.Text = "Carat tối đa là 8";
                 return;
             }
 
@@ -133,7 +180,8 @@ namespace QuanLyTiemDaQuy.Forms
             _currentPriceResult = _pricingService.CalculatePurchasePrice(
                 _currentStoneTypeId, carat, color, clarity, cut);
 
-            // Display results
+            // Display results - màu xanh cho giá đề xuất
+            lblSuggestedPrice.ForeColor = System.Drawing.Color.FromArgb(0, 255, 150);
             lblSuggestedPrice.Text = $"{_currentPriceResult.SuggestedPrice:N0} VNĐ";
             lblPriceRange.Text = $"Cho phép: {_currentPriceResult.MinPrice:N0} - {_currentPriceResult.MaxPrice:N0} VNĐ";
             txtPriceBreakdown.Text = _currentPriceResult.PriceBreakdown;
@@ -178,14 +226,108 @@ namespace QuanLyTiemDaQuy.Forms
                 return false;
             }
 
-            if (string.IsNullOrWhiteSpace(txtCertIssuer.Text))
+            // Đơn vị cấp bây giờ là ComboBox, luôn có giá trị được chọn
+            if (cboCertIssuer == null || cboCertIssuer.SelectedIndex < 0)
             {
-                MessageBox.Show("Vui lòng nhập đơn vị cấp chứng chỉ (GIA, IGI, AGS...)!", 
+                MessageBox.Show("Vui lòng chọn đơn vị cấp chứng chỉ (GIA, IGI, AGS...)!", 
                     "Thiếu thông tin", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtCertIssuer.Focus();
+                cboCertIssuer?.Focus();
                 return false;
             }
 
+            // Kiểm tra format GIA: tối đa 10 chữ số
+            string selectedIssuer = cboCertIssuer.SelectedItem?.ToString() ?? "";
+            if (selectedIssuer.StartsWith("GIA"))
+            {
+                string certCode = txtCertCode.Text.Trim();
+                
+                // GIA report number chỉ chứa số, tối đa 10 chữ số
+                if (!System.Text.RegularExpressions.Regex.IsMatch(certCode, @"^\d{1,10}$"))
+                {
+                    MessageBox.Show(
+                        "Mã chứng chỉ GIA phải là số và tối đa 10 chữ số!\n\n" +
+                        "💡 Bạn có thể kiểm tra chứng chỉ GIA tại:\n" +
+                        "https://www.gia.edu/report-check-landing", 
+                        "Mã GIA không hợp lệ", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtCertCode.Focus();
+                    return false;
+                }
+
+                // Hỏi người dùng có muốn kiểm tra trực tuyến không
+                var checkOnline = MessageBox.Show(
+                    $"Mã GIA: {certCode}\n\n" +
+                    "⚠️ BẮT BUỘC XÁC MINH CHỨNG CHỈ GIA TRƯỚC KHI THU MUA!\n\n" +
+                    "• Yes = Mở browser xác minh trên gia.edu\n" +
+                    "• No = Hủy bỏ, nhập lại thông tin",
+                    "Xác minh chứng chỉ GIA (BẮT BUỘC)",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+
+                if (checkOnline == DialogResult.Yes)
+                {
+                    // Mở browser với GIA Report Check - KHÓA APP CHO ĐẾN KHI TẮT BROWSER
+                    try
+                    {
+                        this.Enabled = false; // Disable form
+                        this.Cursor = Cursors.WaitCursor;
+                        
+                        var process = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                        {
+                            FileName = $"https://www.gia.edu/report-check-landing?reportno={certCode}",
+                            UseShellExecute = true
+                        });
+                        
+                        // Chờ browser đóng
+                        if (process != null)
+                        {
+                            process.WaitForExit();
+                        }
+                        
+                        this.Cursor = Cursors.Default;
+                        this.Enabled = true;
+                        
+                        // Sau khi đóng browser, hỏi kết quả xác minh
+                        var verified = MessageBox.Show(
+                            "Bạn đã xác minh chứng chỉ GIA thành công?\n\n" +
+                            "• Yes = Chứng chỉ hợp lệ, tiếp tục thêm vào phiếu\n" +
+                            "• No = Chứng chỉ không hợp lệ, hủy bỏ",
+                            "Kết quả xác minh GIA",
+                            MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                        if (verified == DialogResult.Yes)
+                        {
+                            return true; // Đã xác minh - cho phép thêm
+                        }
+                        else
+                        {
+                            ClearGemstoneInput();
+                            return false;
+                        }
+                    }
+                    catch
+                    {
+                        this.Cursor = Cursors.Default;
+                        this.Enabled = true;
+                        System.Diagnostics.Process.Start("https://www.gia.edu/report-check-landing");
+                        MessageBox.Show(
+                            "Vui lòng xác minh chứng chỉ trên trang GIA.\n\n" +
+                            "Sau khi xác minh xong, quay lại nhập thông tin và thêm vào phiếu.",
+                            "Đang xác minh...", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+                else
+                {
+                    // No = Hủy bỏ, reset hết dữ liệu
+                    MessageBox.Show(
+                        "❌ KHÔNG THỂ THU MUA KHI CHƯA XÁC MINH CHỨNG CHỈ GIA!\n\n" +
+                        "Vui lòng xác minh chứng chỉ trước khi thêm vào phiếu nhập.",
+                        "Yêu cầu xác minh", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    ClearGemstoneInput();
+                }
+                
+                return false; // LUÔN return false - bắt buộc xác minh GIA
+            }
+
+            // Các loại chứng chỉ khác (IGI, HRD, AGS, Gübelin) - cho phép thêm
             return true;
         }
 
@@ -288,12 +430,21 @@ namespace QuanLyTiemDaQuy.Forms
         {
             txtCarat.Clear();
             txtCertCode.Clear();
-            txtCertIssuer.Clear();
+            
+            // Reset cboCertIssuer thay vì txtCertIssuer
+            if (cboCertIssuer != null && cboCertIssuer.Items.Count > 0)
+                cboCertIssuer.SelectedIndex = 0;
+            
             dtpCertDate.Value = DateTime.Today;
             txtPriceBreakdown.Clear();
             lblSuggestedPrice.Text = "---";
             lblPriceRange.Text = "";
+            
+            // QUAN TRỌNG: Reset Minimum và Maximum trước khi set Value = 0
+            numFinalPrice.Minimum = 0;
+            numFinalPrice.Maximum = decimal.MaxValue;
             numFinalPrice.Value = 0;
+            
             _currentPriceResult = null;
             
             if (cboStoneType.Items.Count > 0) cboStoneType.SelectedIndex = 0;

@@ -106,7 +106,7 @@ public class ProductRepository : IProductRepository
             DatabaseHelper.CreateParameter("@StockQty", product.StockQty),
             DatabaseHelper.CreateParameter("@Status", product.Status),
             DatabaseHelper.CreateParameter("@ImagePath", product.ImagePath),
-            DatabaseHelper.CreateParameter("@CertId", product.CertId),
+            DatabaseHelper.CreateParameter("@CertId", product.CertId == 0 ? (object)DBNull.Value : product.CertId),
             DatabaseHelper.CreateParameter("@DisplayLocation", product.DisplayLocation));
 
         return Convert.ToInt32(result);
@@ -147,7 +147,7 @@ public class ProductRepository : IProductRepository
             DatabaseHelper.CreateParameter("@StockQty", product.StockQty),
             DatabaseHelper.CreateParameter("@Status", product.Status),
             DatabaseHelper.CreateParameter("@ImagePath", product.ImagePath),
-            DatabaseHelper.CreateParameter("@CertId", product.CertId),
+            DatabaseHelper.CreateParameter("@CertId", product.CertId == 0 ? (object)DBNull.Value : product.CertId),
             DatabaseHelper.CreateParameter("@DisplayLocation", product.DisplayLocation));
 
         return affected > 0;

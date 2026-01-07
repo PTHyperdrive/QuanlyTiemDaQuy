@@ -475,6 +475,7 @@ namespace QuanLyTiemDaQuy.Forms
             this.cboCustomer.Name = "cboCustomer";
             this.cboCustomer.Size = new System.Drawing.Size(200, 25);
             this.cboCustomer.TabIndex = 1;
+            this.cboCustomer.SelectedIndexChanged += new System.EventHandler(this.cboCustomer_SelectedIndexChanged);
             // 
             // lblCustomer
             // 

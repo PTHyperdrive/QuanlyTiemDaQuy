@@ -70,4 +70,5 @@ public class DashboardStats
     public decimal MonthRevenue { get; set; }
     public int TodayInvoices { get; set; }
     public int MonthInvoices { get; set; }
+    public int TodayNewCustomers { get; set; }
 }

@@ -31,7 +31,7 @@ namespace QuanLyTiemDaQuy.Core.DAL.Repositories
                         VALUES (N'Giảm giá VIP', 10, 'VIP', 1, 10);
 
                         INSERT INTO DiscountRules (Name, DiscountPercent, ApplicableTier, IsActive, Priority)
-                        VALUES (N'Giảm giá VVIP', 0, 'VVIP', 1, 10);
+                        VALUES (N'Giảm giá VVIP', 25, 'VVIP', 1, 20);
                     ";
                     DatabaseHelper.ExecuteNonQuery(createQuery);
                 }

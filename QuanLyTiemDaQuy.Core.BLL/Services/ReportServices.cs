@@ -52,6 +52,12 @@ public class ReportService : IReportService
                 SELECT COUNT(*) FROM Invoices 
                 WHERE MONTH(InvoiceDate) = MONTH(GETDATE()) AND YEAR(InvoiceDate) = YEAR(GETDATE())");
             stats.MonthInvoices = Convert.ToInt32(result);
+
+            // Today's new customers
+            result = DatabaseHelper.ExecuteScalar(@"
+                SELECT COUNT(*) FROM Customers 
+                WHERE CAST(CreatedAt AS DATE) = CAST(GETDATE() AS DATE)");
+            stats.TodayNewCustomers = Convert.ToInt32(result);
         }
         catch
         {
