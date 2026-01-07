@@ -187,9 +187,11 @@ namespace QuanLyTiemDaQuy.Forms
             txtPriceBreakdown.Text = _currentPriceResult.PriceBreakdown;
             
             // Set suggested price as default
-            numFinalPrice.Value = _currentPriceResult.SuggestedPrice;
-            numFinalPrice.Minimum = _currentPriceResult.MinPrice;
-            numFinalPrice.Maximum = _currentPriceResult.MaxPrice;
+            // Important: Set constraints BEFORE setting Value to avoid ArgumentOutOfRangeException
+            numFinalPrice.Minimum = 0; // Reset min first
+            numFinalPrice.Maximum = _currentPriceResult.MaxPrice; // Ensure Max is large enough
+            numFinalPrice.Minimum = _currentPriceResult.MinPrice; // Now restrict min
+            numFinalPrice.Value = _currentPriceResult.SuggestedPrice; // Finally set value
         }
 
         private void txtCarat_TextChanged(object sender, EventArgs e)
@@ -373,14 +375,24 @@ namespace QuanLyTiemDaQuy.Forms
             string productName = $"{stoneType?.StoneTypeName ?? "Đá quý"} {carat}ct " +
                                  $"{cboColor.Text}/{cboClarity.Text}/{cboCut.Text}";
 
-            // Add to cart
+            // Add to cart with gem properties for auto product creation
             var item = new ImportDetail
             {
-                ProductCode = txtCertCode.Text.Trim(),
+                ProductCode = txtCertCode.Text.Trim(), // Will be replaced with KC-XXX etc. during save
                 ProductName = productName,
                 Qty = 1,
                 UnitCost = finalPrice,
-                LineTotal = finalPrice
+                LineTotal = finalPrice,
+                // Transient gem properties for auto product creation
+                StoneTypeId = stoneType?.StoneTypeId ?? 0,
+                Carat = carat,
+                Color = cboColor.Text,
+                Clarity = cboClarity.Text,
+                Cut = cboCut.Text,
+                CertCode = txtCertCode.Text.Trim(),
+                CertIssuer = cboCertIssuer?.SelectedItem?.ToString() ?? "",
+                CertDate = dtpCertDate.Value,
+                DisplayLocation = "" // Default empty, can be set later
             };
             _cartItems.Add(item);
 

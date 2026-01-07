@@ -1,160 +1,205 @@
-# 💎 Quản Lý Tiệm Đá Quý
+# 💎 QuanLyTiemDaQuy - Jewelry Store Management System
 
-Hệ thống quản lý tiệm đá quý với các tính năng quản lý sản phẩm, khách hàng, bán hàng, nhập hàng, và báo cáo.
+A comprehensive jewelry store management system for gemstone trading, supporting desktop (Windows) and mobile (Android) platforms.
 
-## 📋 Tính năng chính
+---
 
-- **Dashboard**: Thống kê tổng quan (doanh thu, sản phẩm, khách hàng)
-- **Quản lý sản phẩm**: Thêm, sửa, xóa sản phẩm đá quý với thông tin chi tiết
-- **Quản lý khách hàng**: Lưu trữ thông tin khách hàng, lịch sử mua hàng
-- **Bán hàng**: Tạo hóa đơn, quản lý đơn hàng
-- **Nhập hàng**: Quản lý phiếu nhập từ nhà cung cấp
-- **Nhà cung cấp**: Quản lý thông tin nhà cung cấp
-- **Báo cáo**: Báo cáo doanh thu theo ngày/tháng/năm
-- **Quản lý hệ thống**: Quản lý tài khoản nhân viên và chi nhánh
+## 📦 Editions
 
-## 🛠️ Công nghệ sử dụng
+| Edition | Platform | Framework | Use Case |
+|---------|----------|-----------|----------|
+| **Mainline** | Windows Desktop | .NET Framework 4.8 | Full-featured desktop application |
+| **Mobile** | Android | .NET MAUI | Sales staff mobile app |
+| **POS Embedded** | Windows Embedded 10 | .NET MAUI (WinUI) | Point-of-sale terminals |
 
-- **Framework**: .NET Framework 4.8
-- **UI**: Windows Forms
-- **Database**: SQL Server
-- **Language**: C# 8.0
-- **IDE**: Visual Studio 2022
+---
 
-## 🏗️ Kiến trúc dự án (3-Layer Architecture)
+## ✨ Features
+
+### � Dashboard
+- Real-time sales statistics
+- Revenue tracking (daily/monthly)
+- Low stock alerts
+- Quick access to all modules
+
+### � Product Management
+- Complete gemstone catalog (Diamond, Ruby, Sapphire, Emerald, etc.)
+- 4C grading system (Carat, Color, Clarity, Cut)
+- Certificate management (GIA, IGI, HRD, AGS, Gübelin)
+- Automatic product code generation (KC-XXX, RB-XXX, etc.)
+- Display location tracking
+
+### � Sales & Invoicing
+- Quick sales processing
+- Customer lookup
+- Discount management (VIP tiers)
+- Invoice printing
+- Payment tracking
+
+### � Import Management
+- Purchase from suppliers
+- Auto-create products during import
+- Certificate validation
+- Market price integration
+- Import cost tracking
+
+### 👥 Customer Management
+- Customer database
+- VIP/VVIP tier system
+- Purchase history
+- Loyalty discounts
+
+### 📊 Reports
+- Invoice reports (by date, status)
+- Import stock reports
+- Revenue analytics
+- Export to various formats
+
+### 🔐 Security & Access Control
+- Role-based access (Admin, Manager, Sales)
+- Password management
+- Activity logging
+- Module visibility per role
+
+---
+
+## 🛠️ Technology Stack
+
+| Component | Technology |
+|-----------|------------|
+| Desktop App | Windows Forms (.NET 4.8) |
+| Mobile App | .NET MAUI (Android) |
+| Database | SQL Server |
+| Architecture | 3-Layer (DAL → BLL → UI) |
+| ORM | ADO.NET with stored procedures |
+
+---
+
+## 📁 Project Structure
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    UI / Forms                           │
-│         (MainForm, ProductForm, SalesForm...)           │
-│                         ↓ ↑                             │
-├─────────────────────────────────────────────────────────┤
-│                        BLL                              │
-│              Business Logic Layer                       │
-│       (EmployeeService, ProductService...)              │
-│                         ↓ ↑                             │
-├─────────────────────────────────────────────────────────┤
-│                        DAL                              │
-│               Data Access Layer                         │
-│     (EmployeeRepository, ProductRepository...)          │
-│                         ↓ ↑                             │
-├─────────────────────────────────────────────────────────┤
-│                     Database                            │
-│                   (SQL Server)                          │
-└─────────────────────────────────────────────────────────┘
+QuanlyTiemDaQuy/
+├── Forms/                      # WinForms UI (Mainline)
+├── QuanLyTiemDaQuy.BLL/        # Business Logic Layer
+├── QuanLyTiemDaQuy.DAL/        # Data Access Layer
+├── QuanLyTiemDaQuy.Models/     # Shared Models
+├── QuanLyTiemDaQuy.Maui/       # Mobile & POS WinUI App
+├── QuanLyTiemDaQuy.Core/       # Shared Core (MAUI)
+├── QuanLyTiemDaQuy.Core.BLL/   # Core Business Logic
+├── QuanLyTiemDaQuy.Core.DAL/   # Core Data Access
+└── Database/                   # SQL Scripts
 ```
 
-### 📁 Cấu trúc thư mục
+---
 
-```
-QuanLyTiemDaQuy/
-├── QuanLyTiemDaQuy.Models/     ← Data models (Employee, Product, Customer...)
-├── QuanLyTiemDaQuy.DAL/        ← Repositories (SQL queries)
-├── QuanLyTiemDaQuy.BLL/        ← Services (Business logic)
-└── QuanLyTiemDaQuy/Forms/      ← UI (Windows Forms)
-```
+## � Installation
 
-### 🔷 DAL - Data Access Layer (Lớp truy cập dữ liệu)
+### Prerequisites
 
-**Vị trí:** `QuanLyTiemDaQuy.DAL/Repositories/`
+- **Windows 10/11** (for Desktop & POS Embedded)
+- **SQL Server 2019+** or Azure SQL
+- **.NET Framework 4.8** (Mainline)
+- **.NET 8.0 SDK** (for development)
+- **Android 8.0+** (Mobile)
 
-**Nhiệm vụ:**
-- Thực thi SQL queries (SELECT, INSERT, UPDATE, DELETE)
-- Chuyển đổi dữ liệu từ `DataTable` → `Model objects`
-- **KHÔNG** chứa logic nghiệp vụ
+### Quick Start
 
-**Ví dụ:**
-```csharp
-// EmployeeRepository.cs - Chỉ lấy dữ liệu, không kiểm tra quyền
-public Employee? GetById(int employeeId)
-{
-    string query = "SELECT * FROM Employees WHERE EmployeeId = @Id";
-    var dt = DatabaseHelper.ExecuteQuery(query, 
-        DatabaseHelper.CreateParameter("@Id", employeeId));
-    var list = MapDataTableToList(dt);
-    return list.Count > 0 ? list[0] : null;
-}
-```
-
-### 🔶 BLL - Business Logic Layer (Lớp logic nghiệp vụ)
-
-**Vị trí:** `QuanLyTiemDaQuy.BLL/Services/`
-
-**Nhiệm vụ:**
-- Kiểm tra quyền (Admin mới được đặt mật khẩu)
-- Validation dữ liệu (email hợp lệ, password đủ mạnh)
-- Xử lý nghiệp vụ phức tạp (tính giá, tạo hóa đơn)
-- Gọi Repository để lấy/lưu dữ liệu
-
-**Ví dụ:**
-```csharp
-// EmployeeService.cs - Chứa logic nghiệp vụ
-public (bool Success, string Message) SetPassword(int employeeId, string newPassword)
-{
-    // 1. Kiểm tra quyền (Logic nghiệp vụ)
-    if (!CurrentEmployee?.IsAdmin ?? true)
-        return (false, "Chỉ Admin mới có quyền đặt mật khẩu");
-
-    // 2. Validation (Logic nghiệp vụ)
-    if (newPassword.Length < 6)
-        return (false, "Mật khẩu phải có ít nhất 6 ký tự");
-
-    // 3. Gọi DAL để thực hiện
-    bool success = _employeeRepository.SetPassword(employeeId, newPassword);
-    return (success, "Đặt mật khẩu thành công");
-}
-```
-
-### 💡 Tại sao tách lớp?
-
-| Lợi ích | Giải thích |
-|---------|------------|
-| **Dễ bảo trì** | Thay đổi DB? Chỉ sửa DAL. Thay đổi quy tắc? Chỉ sửa BLL |
-| **Tái sử dụng** | Một Service có thể dùng cho WinForms, Web, Mobile |
-| **Dễ test** | Test từng lớp riêng biệt |
-| **Phân công** | Dev A làm DAL, Dev B làm BLL |
-
-## 👥 Phân quyền người dùng
-
-| Vai trò | Quyền hạn |
-|---------|-----------|
-| **Admin** | Toàn quyền: quản lý tài khoản, chi nhánh, báo cáo, nhà cung cấp |
-| **Manager** | Xem báo cáo, quản lý nhà cung cấp, quản lý tài khoản |
-| **Sales** | Bán hàng, quản lý khách hàng, xem sản phẩm |
-
-## 🚀 Hướng dẫn cài đặt
-
-### Yêu cầu
-- Visual Studio 2022
-- SQL Server 2019+
-- .NET Framework 4.8
-
-### Các bước
-
-1. **Clone repository**
+1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/your-org/QuanlyTiemDaQuy.git
    ```
 
-2. **Tạo database**
-   - Mở SQL Server Management Studio
-   - Chạy script tạo database (nếu có)
+2. **Set up the database**
+   ```bash
+   # Run the database scripts in order
+   sqlcmd -S localhost -i Database/01_CreateTables.sql
+   sqlcmd -S localhost -i Database/02_SeedData.sql
+   ```
 
-3. **Cấu hình connection string**
-   - Mở file `QuanLyTiemDaQuy.DAL/DatabaseHelper.cs`
-   - Sửa `_connectionString` theo cấu hình SQL Server của bạn
+3. **Configure connection string**
+   Edit `App.config` and update the connection string.
 
-4. **Build và chạy**
-   - Mở solution trong Visual Studio
-   - Build solution (Ctrl + Shift + B)
-   - Chạy ứng dụng (F5)
+4. **Build and run**
+   ```bash
+   # Mainline (Desktop)
+   dotnet build QuanlyTiemDaQuy.csproj
+   
+   # Mobile (APK)
+   dotnet build QuanLyTiemDaQuy.Maui -f net9.0-android
+   
+   # POS Embedded (Windows)
+   dotnet build QuanLyTiemDaQuy.Maui -f net9.0-windows10.0.19041.0
+   ```
 
-## 📝 Tài khoản mặc định
+---
 
-| Username | Password | Vai trò |
-|----------|----------|---------|
-| admin | admin123 | Admin |
+## 🔑 License Keys
+
+The application supports 3 license types:
+
+| License | Code | Features |
+|---------|------|----------|
+| **Full** | `QLTDQ-FULL-XXXX-XXXX` | All features, unlimited devices |
+| **POS** | `QLTDQ-POS-XXXX-XXXX` | Sales, Products, Customers only |
+| **POS Embedded** | `QLTDQ-POSE-XXXX-XXXX` | Optimized for embedded devices |
+
+### Default Test Keys (Development Only)
+```
+Full:         QLTDQ-FULL-DEV1-2026
+POS:          QLTDQ-POS-DEV1-2026
+POS Embedded: QLTDQ-POSE-DEV1-2026
+```
+
+---
+
+## � Building Installers
+
+We recommend **Inno Setup** for creating Windows installers.
+
+### Install Inno Setup
+Download from: https://jrsoftware.org/isinfo.php
+
+### Build Installers
+
+```powershell
+# 1. Build all editions
+.\build-all.ps1
+
+# 2. Create installers
+iscc installer\mainline.iss    # Desktop installer
+iscc installer\pos-embedded.iss # POS Embedded installer
+```
+
+### Installer Output
+```
+dist/
+├── QuanLyTiemDaQuy-Setup-Mainline-v1.0.exe
+├── QuanLyTiemDaQuy-Setup-POSEmbedded-v1.0.exe
+└── QuanLyTiemDaQuy-Mobile-v1.0.apk
+```
+
+---
+
+## 👥 Default Accounts
+
+| Role | Username | Password |
+|------|----------|----------|
+| Admin | `admin` | `Admin@123` |
+| Manager | `manager` | `Manager@123` |
+| Sales | `sales` | `Sales@123` |
+
+---
+
+## 📞 Support
+
+- **Email**: support@jewelry-pos.vn
+- **Hotline**: 1900-XXX-XXX
+- **Documentation**: [Wiki](./docs/wiki.md)
+
+---
 
 ## 📄 License
 
-© 2024 - Quản Lý Tiệm Đá Quý
+Copyright © 2026 Jewelry POS Solutions. All rights reserved.
+
+See [LICENSE](./LICENSE) for details.

@@ -57,3 +57,7 @@ nunit-*.xml
 QuanLyTiemDaQuy.Maui/QuanLyTiemDaQuy.Maui.csproj.user
 .vs/QuanlyTiemDaQuy/v17/.suo
 /.vs
+/dist
+/.vs
+/.vs
+/.vs

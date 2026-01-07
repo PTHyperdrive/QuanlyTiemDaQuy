@@ -23,6 +23,7 @@ namespace QuanLyTiemDaQuy.Forms
             this.btnReport = new System.Windows.Forms.Button();
             this.btnMarketPrice = new System.Windows.Forms.Button();
             this.btnImport = new System.Windows.Forms.Button();
+            this.btnImportReport = new System.Windows.Forms.Button();
             this.btnDiscounts = new System.Windows.Forms.Button(); // Added instantiation
             this.btnSales = new System.Windows.Forms.Button();
             this.btnSuppliers = new System.Windows.Forms.Button();
@@ -79,6 +80,7 @@ namespace QuanLyTiemDaQuy.Forms
             this.pnlSidebar.Controls.Add(this.btnReport);
             this.pnlSidebar.Controls.Add(this.btnMarketPrice);
             this.pnlSidebar.Controls.Add(this.btnImport);
+            this.pnlSidebar.Controls.Add(this.btnImportReport);
             this.pnlSidebar.Controls.Add(this.btnDiscounts); // Added
             this.pnlSidebar.Controls.Add(this.btnSales);
             this.pnlSidebar.Controls.Add(this.btnSuppliers);
@@ -193,6 +195,23 @@ namespace QuanLyTiemDaQuy.Forms
             this.btnImport.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnImport.UseVisualStyleBackColor = true;
             this.btnImport.Click += new System.EventHandler(this.btnImport_Click);
+            // 
+            // btnImportReport
+            // 
+            this.btnImportReport.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnImportReport.FlatAppearance.BorderSize = 0;
+            this.btnImportReport.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnImportReport.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.btnImportReport.ForeColor = System.Drawing.Color.Gainsboro;
+            this.btnImportReport.Location = new System.Drawing.Point(0, 330);
+            this.btnImportReport.Name = "btnImportReport";
+            this.btnImportReport.Padding = new System.Windows.Forms.Padding(15, 0, 0, 0);
+            this.btnImportReport.Size = new System.Drawing.Size(220, 45);
+            this.btnImportReport.TabIndex = 12;
+            this.btnImportReport.Text = "📦  BC Nhập kho";
+            this.btnImportReport.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnImportReport.UseVisualStyleBackColor = true;
+            this.btnImportReport.Click += new System.EventHandler(this.btnImportReport_Click);
             // 
             // btnSales
             // 
@@ -644,6 +663,7 @@ namespace QuanLyTiemDaQuy.Forms
         private System.Windows.Forms.Button btnMarketPrice;
         private System.Windows.Forms.Button btnUsers;
         private System.Windows.Forms.Button btnDiscounts; // Added
+        private System.Windows.Forms.Button btnImportReport;
         private System.Windows.Forms.Button btnLogout;
         private System.Windows.Forms.Panel pnlHeader;
         private System.Windows.Forms.Label lblTitle;

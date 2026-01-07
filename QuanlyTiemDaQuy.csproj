@@ -136,6 +136,9 @@
     <Compile Include="Forms\DiscountManagementForm.Designer.cs">
       <DependentUpon>DiscountManagementForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\ImportReportForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Forms\LoginForm.resx">

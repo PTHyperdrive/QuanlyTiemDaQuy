@@ -63,22 +63,90 @@ namespace QuanLyTiemDaQuy.BLL.Services
             if (receipt.EmployeeId <= 0)
                 return (false, "Không xác định được nhân viên tạo phiếu", 0);
 
-            // Validate each detail and calculate totals
+            // Validate each detail and create products if needed
             decimal totalCost = 0;
             foreach (var detail in receipt.Details)
             {
-                var product = _productRepository.GetById(detail.ProductId);
-                if (product == null)
-                    return (false, $"Sản phẩm ID {detail.ProductId} không tồn tại", 0);
+                // If ProductId is 0, we need to auto-create the product
+                if (detail.ProductId == 0)
+                {
+                    // Get stone type name for generating product code
+                    var stoneTypes = new ProductService().GetAllStoneTypes();
+                    var stoneType = stoneTypes.Find(st => st.StoneTypeId == detail.StoneTypeId);
+                    string stoneTypeName = stoneType?.Name ?? "SP";
+
+                    // Generate product code (e.g., KC-001 for Kim cương)
+                    string productCode = _productRepository.GetNextProductCode(stoneTypeName);
+
+                    // First, create certificate if needed
+                    int certId = 0;
+                    if (!string.IsNullOrEmpty(detail.CertCode))
+                    {
+                        var certRepo = new CertificateRepository();
+                        var existingCert = certRepo.GetByCode(detail.CertCode);
+                        if (existingCert != null)
+                        {
+                            certId = existingCert.CertId;
+                        }
+                        else
+                        {
+                            // Create new certificate
+                            var newCert = new Certificate
+                            {
+                                CertCode = detail.CertCode,
+                                Issuer = detail.CertIssuer,
+                                IssueDate = detail.CertDate,
+                                CreatedAt = DateTime.Now
+                            };
+                            certId = certRepo.Insert(newCert);
+                        }
+                    }
+
+                    // Calculate sell price = cost + 30% margin
+                    decimal sellPrice = detail.UnitCost * 1.3m;
+
+                    // Create new product
+                    var newProduct = new Product
+                    {
+                        ProductCode = productCode,
+                        Name = detail.ProductName,
+                        StoneTypeId = detail.StoneTypeId,
+                        Carat = detail.Carat,
+                        Color = detail.Color,
+                        Clarity = detail.Clarity,
+                        Cut = detail.Cut,
+                        StockQty = detail.Qty,
+                        CostPrice = detail.UnitCost,
+                        SellPrice = sellPrice,
+                        DisplayLocation = detail.DisplayLocation,
+                        CertId = certId,
+                        CreatedAt = DateTime.Now
+                    };
+
+                    int productId = _productRepository.Insert(newProduct);
+                    if (productId <= 0)
+                        return (false, $"Không thể tạo sản phẩm mới: {detail.ProductName}", 0);
+
+                    // Update detail with the new product info
+                    detail.ProductId = productId;
+                    detail.ProductCode = productCode;
+                }
+                else
+                {
+                    var product = _productRepository.GetById(detail.ProductId);
+                    if (product == null)
+                        return (false, $"Sản phẩm ID {detail.ProductId} không tồn tại", 0);
+
+                    detail.ProductCode = product.ProductCode;
+                    detail.ProductName = product.Name;
+                }
 
                 if (detail.Qty <= 0)
-                    return (false, $"Số lượng nhập của {product.Name} phải lớn hơn 0", 0);
+                    return (false, $"Số lượng nhập của {detail.ProductName} phải lớn hơn 0", 0);
 
                 if (detail.UnitCost < 0)
-                    return (false, $"Giá nhập của {product.Name} không hợp lệ", 0);
+                    return (false, $"Giá nhập của {detail.ProductName} không hợp lệ", 0);
 
-                detail.ProductCode = product.ProductCode;
-                detail.ProductName = product.Name;
                 detail.CalculateLineTotal();
                 totalCost += detail.LineTotal;
             }

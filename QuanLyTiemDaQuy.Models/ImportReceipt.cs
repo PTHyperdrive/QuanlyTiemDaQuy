@@ -49,6 +49,18 @@ namespace QuanLyTiemDaQuy.Models
         public decimal UnitCost { get; set; }
         public decimal LineTotal { get; set; }
 
+        // Transient gem properties for auto-creating products during import
+        // These are not persisted to the ImportDetail table
+        public int StoneTypeId { get; set; }
+        public decimal Carat { get; set; }
+        public string Color { get; set; } = string.Empty;
+        public string Clarity { get; set; } = string.Empty;
+        public string Cut { get; set; } = string.Empty;
+        public string CertCode { get; set; } = string.Empty;
+        public string CertIssuer { get; set; } = string.Empty;
+        public DateTime CertDate { get; set; } = DateTime.Now;
+        public string DisplayLocation { get; set; } = string.Empty;
+
         public void CalculateLineTotal()
         {
             LineTotal = Qty * UnitCost;

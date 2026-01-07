@@ -59,6 +59,9 @@ namespace QuanLyTiemDaQuy.Forms
 
             // Chỉ Admin hoặc Director mới được vào trang Giảm giá (Manager và Sales không được)
             btnDiscounts.Visible = employee.Role == "Admin" || employee.Role == "Director";
+
+            // Báo cáo nhập kho: Admin và Manager được thấy, nhân viên (Sales) không thấy
+            btnImportReport.Visible = employee.IsManager;
         }
 
         private void LoadDashboardStats()
@@ -203,6 +206,13 @@ namespace QuanLyTiemDaQuy.Forms
             ActivateButton(sender);
             pnlDashboard.Visible = false;
             OpenChildForm(new DiscountManagementForm());
+        }
+
+        private void btnImportReport_Click(object sender, EventArgs e)
+        {
+            ActivateButton(sender);
+            pnlDashboard.Visible = false;
+            OpenChildForm(new ImportReportForm());
         }
 
 
