@@ -9,7 +9,7 @@ Hệ thống quản lý cửa hàng kim hoàn và đá quý toàn diện, hỗ t
 | Phiên bản | Nền tảng | Framework | Mục đích sử dụng |
 |-----------|----------|-----------|------------------|
 | **Mainline** | Windows Desktop | .NET Framework 4.8 | Ứng dụng desktop đầy đủ tính năng |
-| **Mobile** | Android | .NET MAUI | Ứng dụng di động cho nhân viên bán hàng |
+| **POS Mobile** | Android | .NET MAUI | Ứng dụng di động cho nhân viên bán hàng |
 | **POS Embedded** | Windows Embedded 10 | .NET MAUI (WinUI) | Máy POS tại quầy |
 
 ---
@@ -100,7 +100,7 @@ QuanlyTiemDaQuy/
 - **SQL Server 2019+** hoặc Azure SQL
 - **.NET Framework 4.8** (Mainline)
 - **.NET 10.0 SDK** (cho phát triển)
-- **Android 8.0+** (Mobile)
+- **Android 8.0+** (POS Mobile)
 
 ### Bắt Đầu Nhanh
 
@@ -124,7 +124,7 @@ QuanlyTiemDaQuy/
    # Mainline (Desktop)
    dotnet build QuanlyTiemDaQuy.csproj
    
-   # Mobile (APK)
+   # POS Mobile (APK)
    dotnet build QuanLyTiemDaQuy.Maui -f net10.0-android
    
    # POS Embedded (Windows)
