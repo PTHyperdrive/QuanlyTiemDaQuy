@@ -1,205 +1,196 @@
-# 💎 QuanLyTiemDaQuy - Jewelry Store Management System
+# 💎 QuanLyTiemDaQuy - Hệ Thống Quản Lý Tiệm Đá Quý
 
-A comprehensive jewelry store management system for gemstone trading, supporting desktop (Windows) and mobile (Android) platforms.
-
----
-
-## 📦 Editions
-
-| Edition | Platform | Framework | Use Case |
-|---------|----------|-----------|----------|
-| **Mainline** | Windows Desktop | .NET Framework 4.8 | Full-featured desktop application |
-| **Mobile** | Android | .NET MAUI | Sales staff mobile app |
-| **POS Embedded** | Windows Embedded 10 | .NET MAUI (WinUI) | Point-of-sale terminals |
+Hệ thống quản lý cửa hàng kim hoàn và đá quý toàn diện, hỗ trợ nền tảng desktop (Windows) và di động (Android).
 
 ---
 
-## ✨ Features
+## 📦 Phiên Bản
 
-### � Dashboard
-- Real-time sales statistics
-- Revenue tracking (daily/monthly)
-- Low stock alerts
-- Quick access to all modules
-
-### � Product Management
-- Complete gemstone catalog (Diamond, Ruby, Sapphire, Emerald, etc.)
-- 4C grading system (Carat, Color, Clarity, Cut)
-- Certificate management (GIA, IGI, HRD, AGS, Gübelin)
-- Automatic product code generation (KC-XXX, RB-XXX, etc.)
-- Display location tracking
-
-### � Sales & Invoicing
-- Quick sales processing
-- Customer lookup
-- Discount management (VIP tiers)
-- Invoice printing
-- Payment tracking
-
-### � Import Management
-- Purchase from suppliers
-- Auto-create products during import
-- Certificate validation
-- Market price integration
-- Import cost tracking
-
-### 👥 Customer Management
-- Customer database
-- VIP/VVIP tier system
-- Purchase history
-- Loyalty discounts
-
-### 📊 Reports
-- Invoice reports (by date, status)
-- Import stock reports
-- Revenue analytics
-- Export to various formats
-
-### 🔐 Security & Access Control
-- Role-based access (Admin, Manager, Sales)
-- Password management
-- Activity logging
-- Module visibility per role
+| Phiên bản | Nền tảng | Framework | Mục đích sử dụng |
+|-----------|----------|-----------|------------------|
+| **Mainline** | Windows Desktop | .NET Framework 4.8 | Ứng dụng desktop đầy đủ tính năng |
+| **Mobile** | Android | .NET MAUI | Ứng dụng di động cho nhân viên bán hàng |
+| **POS Embedded** | Windows Embedded 10 | .NET MAUI (WinUI) | Máy POS tại quầy |
 
 ---
 
-## 🛠️ Technology Stack
+## ✨ Tính Năng
 
-| Component | Technology |
-|-----------|------------|
-| Desktop App | Windows Forms (.NET 4.8) |
-| Mobile App | .NET MAUI (Android) |
-| Database | SQL Server |
-| Architecture | 3-Layer (DAL → BLL → UI) |
-| ORM | ADO.NET with stored procedures |
+### 🏠 Bảng Điều Khiển
+- Thống kê bán hàng thời gian thực
+- Theo dõi doanh thu (ngày/tháng)
+- Cảnh báo hàng tồn kho thấp
+- Truy cập nhanh tất cả module
+
+### 📦 Quản Lý Sản Phẩm
+- Danh mục đá quý đầy đủ (Kim cương, Ruby, Sapphire, Emerald, v.v.)
+- Hệ thống phân loại 4C (Carat, Color, Clarity, Cut)
+- Quản lý chứng chỉ (GIA, IGI, HRD, AGS, Gübelin)
+- Tự động sinh mã sản phẩm (KC-XXX, RB-XXX, v.v.)
+- Theo dõi vị trí trưng bày
+
+### 💰 Bán Hàng & Hóa Đơn
+- Xử lý bán hàng nhanh
+- Tra cứu khách hàng
+- Quản lý giảm giá (hạng VIP)
+- In hóa đơn
+- Theo dõi thanh toán
+
+### 📥 Quản Lý Nhập Kho
+- Thu mua từ nhà cung cấp
+- Tự động tạo sản phẩm khi nhập
+- Xác thực chứng chỉ
+- Tích hợp giá thị trường
+- Theo dõi chi phí nhập
+
+### 👥 Quản Lý Khách Hàng
+- Cơ sở dữ liệu khách hàng
+- Hệ thống hạng VIP/VVIP
+- Lịch sử mua hàng
+- Giảm giá thành viên
+
+### 📊 Báo Cáo
+- Báo cáo hóa đơn (theo ngày, trạng thái)
+- Báo cáo nhập kho
+- Phân tích doanh thu
+- Xuất báo cáo nhiều định dạng
+
+### 🔐 Bảo Mật & Phân Quyền
+- Phân quyền theo vai trò (Admin, Manager, Sales)
+- Quản lý mật khẩu
+- Ghi log hoạt động
+- Hiển thị module theo quyền
 
 ---
 
-## 📁 Project Structure
+## 🛠️ Công Nghệ Sử Dụng
+
+| Thành phần | Công nghệ |
+|------------|-----------|
+| Ứng dụng Desktop | Windows Forms (.NET 4.8) |
+| Ứng dụng Mobile | .NET MAUI (Android) |
+| Cơ sở dữ liệu | SQL Server |
+| Kiến trúc | 3 tầng (DAL → BLL → UI) |
+| ORM | ADO.NET với stored procedures |
+
+---
+
+## 📁 Cấu Trúc Dự Án
 
 ```
 QuanlyTiemDaQuy/
-├── Forms/                      # WinForms UI (Mainline)
-├── QuanLyTiemDaQuy.BLL/        # Business Logic Layer
-├── QuanLyTiemDaQuy.DAL/        # Data Access Layer
-├── QuanLyTiemDaQuy.Models/     # Shared Models
-├── QuanLyTiemDaQuy.Maui/       # Mobile & POS WinUI App
-├── QuanLyTiemDaQuy.Core/       # Shared Core (MAUI)
-├── QuanLyTiemDaQuy.Core.BLL/   # Core Business Logic
-├── QuanLyTiemDaQuy.Core.DAL/   # Core Data Access
+├── Forms/                      # Giao diện WinForms (Mainline)
+├── QuanLyTiemDaQuy.BLL/        # Tầng nghiệp vụ
+├── QuanLyTiemDaQuy.DAL/        # Tầng truy cập dữ liệu
+├── QuanLyTiemDaQuy.Models/     # Models dùng chung
+├── QuanLyTiemDaQuy.Maui/       # Ứng dụng Mobile & POS
+├── QuanLyTiemDaQuy.Core/       # Core dùng chung (MAUI)
+├── QuanLyTiemDaQuy.Core.BLL/   # Nghiệp vụ Core
+├── QuanLyTiemDaQuy.Core.DAL/   # Truy cập dữ liệu Core
 └── Database/                   # SQL Scripts
 ```
 
 ---
 
-## � Installation
+## 🚀 Cài Đặt
 
-### Prerequisites
+### Yêu Cầu Hệ Thống
 
-- **Windows 10/11** (for Desktop & POS Embedded)
-- **SQL Server 2019+** or Azure SQL
+- **Windows 10/11** (cho Desktop & POS Embedded)
+- **SQL Server 2019+** hoặc Azure SQL
 - **.NET Framework 4.8** (Mainline)
-- **.NET 8.0 SDK** (for development)
+- **.NET 10.0 SDK** (cho phát triển)
 - **Android 8.0+** (Mobile)
 
-### Quick Start
+### Bắt Đầu Nhanh
 
-1. **Clone the repository**
+1. **Clone repository**
    ```bash
    git clone https://github.com/your-org/QuanlyTiemDaQuy.git
    ```
 
-2. **Set up the database**
+2. **Thiết lập cơ sở dữ liệu**
    ```bash
-   # Run the database scripts in order
+   # Chạy các script database theo thứ tự
    sqlcmd -S localhost -i Database/01_CreateTables.sql
    sqlcmd -S localhost -i Database/02_SeedData.sql
    ```
 
-3. **Configure connection string**
-   Edit `App.config` and update the connection string.
+3. **Cấu hình connection string**
+   Chỉnh sửa `App.config` và cập nhật connection string.
 
-4. **Build and run**
+4. **Build và chạy**
    ```bash
    # Mainline (Desktop)
    dotnet build QuanlyTiemDaQuy.csproj
    
    # Mobile (APK)
-   dotnet build QuanLyTiemDaQuy.Maui -f net9.0-android
+   dotnet build QuanLyTiemDaQuy.Maui -f net10.0-android
    
    # POS Embedded (Windows)
-   dotnet build QuanLyTiemDaQuy.Maui -f net9.0-windows10.0.19041.0
+   dotnet build QuanLyTiemDaQuy.Maui -f net10.0-windows10.0.19041.0
    ```
 
 ---
 
-## 🔑 License Keys
+## 🔑 Mã Bản Quyền
 
-The application supports 3 license types:
+Ứng dụng hỗ trợ 3 loại bản quyền:
 
-| License | Code | Features |
-|---------|------|----------|
-| **Full** | `QLTDQ-FULL-XXXX-XXXX` | All features, unlimited devices |
-| **POS** | `QLTDQ-POS-XXXX-XXXX` | Sales, Products, Customers only |
-| **POS Embedded** | `QLTDQ-POSE-XXXX-XXXX` | Optimized for embedded devices |
-
-### Default Test Keys (Development Only)
-```
-Full:         QLTDQ-FULL-DEV1-2026
-POS:          QLTDQ-POS-DEV1-2026
-POS Embedded: QLTDQ-POSE-DEV1-2026
-```
+| Bản quyền | Mã | Tính năng |
+|-----------|------|----------|
+| **Full** | `QLTDQ-FULL-2505-2004` | Đầy đủ tính năng, không giới hạn thiết bị |
+| **POS** | `QLTDQ-POS-2505-2004` | Chỉ Bán hàng, Sản phẩm, Khách hàng |
+| **POS Embedded** | `QLTDQ-POSE-2505-2004` | Tối ưu cho thiết bị embedded |
 
 ---
 
-## � Building Installers
+## 📥 Tạo Bộ Cài Đặt
 
-We recommend **Inno Setup** for creating Windows installers.
+Sử dụng **Inno Setup** để tạo installer Windows.
 
-### Install Inno Setup
-Download from: https://jrsoftware.org/isinfo.php
+### Cài đặt Inno Setup
+Tải từ: https://jrsoftware.org/isinfo.php
 
-### Build Installers
+### Build tất cả phiên bản
 
 ```powershell
-# 1. Build all editions
-.\build-all.ps1
+# Build tất cả editions
+.\build-all.ps1 -All
 
-# 2. Create installers
-iscc installer\mainline.iss    # Desktop installer
-iscc installer\pos-embedded.iss # POS Embedded installer
+# Tạo unified installer
+& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer\unified.iss
 ```
 
-### Installer Output
+### Kết quả
 ```
 dist/
-├── QuanLyTiemDaQuy-Setup-Mainline-v1.0.exe
-├── QuanLyTiemDaQuy-Setup-POSEmbedded-v1.0.exe
-└── QuanLyTiemDaQuy-Mobile-v1.0.apk
+├── QuanLyTiemDaQuy-Setup-v3.0.1.exe     (Bộ cài đặt hợp nhất)
+├── QuanLyTiemDaQuy-Mobile-v1.0.apk      (APK Android)
 ```
 
 ---
 
-## 👥 Default Accounts
+## 👥 Tài Khoản Mặc Định
 
-| Role | Username | Password |
-|------|----------|----------|
+| Vai trò | Tên đăng nhập | Mật khẩu |
+|---------|---------------|----------|
 | Admin | `admin` | `Admin@123` |
 | Manager | `manager` | `Manager@123` |
 | Sales | `sales` | `Sales@123` |
 
 ---
 
-## 📞 Support
+## 📞 Hỗ Trợ
 
 - **Email**: support@jewelry-pos.vn
 - **Hotline**: 1900-XXX-XXX
-- **Documentation**: [Wiki](./docs/wiki.md)
+- **Tài liệu**: [Wiki](./docs/wiki.md)
 
 ---
 
-## 📄 License
+## 📄 Bản Quyền
 
-Copyright © 2026 Jewelry POS Solutions. All rights reserved.
+Copyright © 2026 Jewelry POS Solutions. Bảo lưu mọi quyền.
 
-See [LICENSE](./LICENSE) for details.
+Xem [LICENSE](./LICENSE) để biết chi tiết.
